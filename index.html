@@ -222,6 +222,15 @@
     background:var(--teal-tint);border-radius:50%;color:var(--teal);margin-bottom:14px;
   }
 
+  .testimonial-card{
+    background:var(--white);border:1px solid var(--line);border-radius:var(--radius-m);
+    padding:24px 22px;display:flex;flex-direction:column;gap:12px;
+  }
+  .testimonial-card .quote-mark{color:var(--teal);font-size:2rem;font-family:Georgia,serif;line-height:1;}
+  .testimonial-card p{font-size:0.94rem;margin:0;font-style:italic;}
+  .testimonial-card .who{font-size:0.85rem;color:var(--navy);font-weight:600;font-style:normal;}
+  .testimonial-card .who span{display:block;color:var(--muted);font-weight:400;font-size:0.8rem;}
+
   .partner-panel{
     background:var(--teal-tint);border-radius:var(--radius-l);
     padding:44px;display:grid;grid-template-columns:1.1fr 0.9fr;gap:40px;align-items:center;
@@ -449,6 +458,46 @@
   .float-btn svg{width:26px;height:26px;}
   .float-btn-whatsapp{background:#25D366;}
   .float-btn-top{background:var(--teal);border:none;cursor:pointer;}
+  .float-btn-chat{background:var(--plum);border:none;cursor:pointer;}
+
+  .chat-panel{
+    position:fixed;right:20px;bottom:90px;z-index:95;
+    width:340px;max-width:calc(100vw - 40px);height:440px;max-height:calc(100vh - 140px);
+    background:var(--white);border:1px solid var(--line);border-radius:var(--radius-m);
+    display:flex;flex-direction:column;overflow:hidden;
+    transform:translateY(16px) scale(0.97);opacity:0;pointer-events:none;
+    transition:transform .15s ease, opacity .15s ease;
+  }
+  .chat-panel.open{transform:translateY(0) scale(1);opacity:1;pointer-events:auto;}
+  .chat-panel-header{
+    background:var(--plum);color:#fff;padding:14px 16px;font-weight:600;font-size:0.94rem;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .chat-panel-header button{background:none;border:none;color:#fff;font-size:1.4rem;line-height:1;cursor:pointer;padding:0;}
+  .chat-panel-body{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:14px;gap:10px;}
+  .chat-preform{display:flex;flex-direction:column;gap:10px;}
+  .chat-preform p{font-size:0.88rem;margin:0;}
+  .chat-preform input{
+    padding:10px 12px;border:1.5px solid var(--line);border-radius:var(--radius-s);
+    font-family:inherit;font-size:0.9rem;
+  }
+  .chat-messages{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;}
+  .chat-msg{max-width:82%;padding:9px 12px;border-radius:12px;font-size:0.88rem;line-height:1.4;}
+  .chat-msg-visitor{align-self:flex-end;background:var(--teal);color:#fff;border-bottom-right-radius:3px;}
+  .chat-msg-admin{align-self:flex-start;background:var(--grey);color:var(--ink);border-bottom-left-radius:3px;}
+  .chat-form{display:flex;gap:8px;}
+  .chat-form input{
+    flex:1;padding:10px 12px;border:1.5px solid var(--line);border-radius:var(--pill);
+    font-family:inherit;font-size:0.9rem;
+  }
+  .chat-form button{
+    width:40px;height:40px;border-radius:50%;background:var(--teal);border:none;color:#fff;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;
+  }
+  .chat-form button svg{width:18px;height:18px;}
+  @media (max-width:640px){
+    .chat-panel{right:14px;bottom:80px;}
+  }
   .float-btn-email{background:var(--teal);}
   .float-label{
     position:absolute;right:64px;top:50%;transform:translateY(-50%);
@@ -464,6 +513,7 @@
     .float-label{display:none;}
   }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
 
@@ -774,6 +824,14 @@
           </svg>
         </div>
       </div>
+    </div>
+  </section>
+
+  <section class="section-grey" id="testimonialsSection" style="display:none;">
+    <div class="container">
+      <p class="kicker">What customers say</p>
+      <h2>Trusted by institutions and businesses across Kenya</h2>
+      <div class="grid grid-3" id="testimonialsGrid" style="margin-top:28px;"></div>
     </div>
   </section>
 
@@ -1351,6 +1409,32 @@
     <span class="float-label" aria-hidden="true">WhatsApp us</span>
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.65-2.05-.17-.3-.02-.46.13-.61.14-.14.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37s-1.04 1.02-1.04 2.48 1.07 2.87 1.22 3.07c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.23 1.36.2 1.87.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.13-.27-.2-.57-.35z"/><path d="M12 2a10 10 0 00-8.66 15L2 22l5.13-1.35A10 10 0 1012 2z"/></svg>
   </a>
+  <button class="float-btn float-btn-chat" id="chatToggle" aria-label="Open live chat" aria-expanded="false" type="button">
+    <span class="float-label" aria-hidden="true">Chat with us</span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+  </button>
+</div>
+
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-panel-header">
+    <span>Chat with Cloaked Innovations</span>
+    <button id="chatClose" aria-label="Close chat" type="button">&times;</button>
+  </div>
+  <div class="chat-panel-body">
+    <div id="chatPreForm" class="chat-preform">
+      <p>Tell us a bit about you to start the chat.</p>
+      <input type="text" id="chatName" placeholder="Your name" aria-label="Your name">
+      <input type="email" id="chatEmail" placeholder="Your email (optional)" aria-label="Your email">
+      <button id="chatStart" class="btn btn-primary btn-block" type="button">Start Chat</button>
+    </div>
+    <div id="chatMessages" class="chat-messages" style="display:none;"></div>
+    <form id="chatForm" class="chat-form" style="display:none;">
+      <input type="text" id="chatInput" placeholder="Type a message&hellip;" aria-label="Type a message" autocomplete="off">
+      <button type="submit" aria-label="Send message">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+      </button>
+    </form>
+  </div>
 </div>
 
 <!-- ========================= FOOTER ========================= -->
@@ -1523,10 +1607,48 @@
 
 <script>
 (function(){
+  // ============================================================
+  // SUPABASE CONFIG — fill in your project's values here.
+  // Find these in Supabase: Settings → API
+  // The anon key is safe to expose in client-side code; Row Level
+  // Security (set up via supabase-schema.sql) controls what it can do.
+  // ============================================================
+  var SUPABASE_URL = "https://swguesxklmbfwanxzjjt.supabase.co"; // e.g. https://xxxxx.supabase.co
+  var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3Z3Vlc3hrbG1iZndhbnh6amp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MzQ3OTIsImV4cCI6MjEwNTUxMDc5Mn0.N6636rHeofqQl_sNylzVgIKrno5jpWQmrNwS3OHh488";
+
+  var supa = null;
+  if (SUPABASE_URL.indexOf("YOUR_SUPABASE") === -1 && window.supabase) {
+    supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
   var pages = ['home','about','products','services','industries','faqs','contact'];
   var navLinks = document.querySelectorAll('[data-nav]');
   var menuToggle = document.getElementById('menuToggle');
   var primaryNav = document.getElementById('primaryNav');
+
+  // ---------- Session ID (used for analytics + chat, no personal data) ----------
+  function getSessionId(){
+    try{
+      var sid = window.localStorage.getItem('cloaked-session-id');
+      if(!sid){
+        sid = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
+        window.localStorage.setItem('cloaked-session-id', sid);
+      }
+      return sid;
+    }catch(e){
+      return 'no-storage-' + Math.random().toString(16).slice(2);
+    }
+  }
+  var sessionId = getSessionId();
+
+  // ---------- Analytics: basic pageview counter ----------
+  function trackPageView(pageId){
+    if(!supa) return;
+    supa.from('page_views').insert({
+      page: pageId,
+      session_id: sessionId,
+      referrer: document.referrer || null
+    }).then(function(){}, function(){});
+  }
 
   function showPage(id){
     if(pages.indexOf(id) === -1) id = 'home';
@@ -1540,6 +1662,7 @@
     window.scrollTo(0,0);
     document.title = titleFor(id);
     closeMenu();
+    trackPageView(id);
   }
 
   function titleFor(id){
@@ -1661,6 +1784,23 @@
       window.location.href = mailto;
       successBox.classList.add('show');
       successBox.scrollIntoView({behavior:'smooth', block:'center'});
+
+      // Save to Supabase so it shows up in the admin panel (Customers/Orders)
+      if(supa){
+        supa.from('customers').insert({
+          full_name: name, organisation: org, email: email, phone: phone
+        }).select().then(function(res){
+          var customerId = (res.data && res.data[0]) ? res.data[0].id : null;
+          supa.from('orders').insert({
+            customer_id: customerId,
+            subject: subjectField,
+            product_needed: product,
+            quantity: qty,
+            message: message,
+            status: 'new'
+          }).then(function(){}, function(){});
+        }, function(){});
+      }
     });
   }
 
@@ -1676,6 +1816,134 @@
       window.scrollTo({top:0, behavior:'smooth'});
     });
   }
+
+  // ---------- Testimonials: load approved ones from Supabase ----------
+  function loadTestimonials(){
+    if(!supa) return;
+    supa.from('testimonials').select('*').eq('approved', true).order('created_at', {ascending:false}).limit(9)
+      .then(function(res){
+        var rows = res.data || [];
+        if(rows.length === 0) return;
+        var grid = document.getElementById('testimonialsGrid');
+        var section = document.getElementById('testimonialsSection');
+        grid.innerHTML = rows.map(function(t){
+          var name = (t.customer_name || '').replace(/</g,'&lt;');
+          var org = (t.organisation || '').replace(/</g,'&lt;');
+          var quote = (t.quote || '').replace(/</g,'&lt;');
+          return '<div class="testimonial-card"><span class="quote-mark" aria-hidden="true">&ldquo;</span>' +
+            '<p>' + quote + '</p>' +
+            '<div class="who">' + name + (org ? '<span>' + org + '</span>' : '') + '</div></div>';
+        }).join('');
+        section.style.display = 'block';
+      }, function(){});
+  }
+  loadTestimonials();
+
+  // ---------- Chat widget ----------
+  function initChatWidget(){
+    if(!supa) return;
+    var conversationId = null;
+
+    try{ conversationId = window.localStorage.getItem('cloaked-chat-conv-id'); }catch(e){}
+
+    var toggle = document.getElementById('chatToggle');
+    var panel = document.getElementById('chatPanel');
+    var closeBtn = document.getElementById('chatClose');
+    var messagesEl = document.getElementById('chatMessages');
+    var formEl = document.getElementById('chatForm');
+    var inputEl = document.getElementById('chatInput');
+    var preForm = document.getElementById('chatPreForm');
+    var nameInput = document.getElementById('chatName');
+    var emailInput = document.getElementById('chatEmail');
+    var startBtn = document.getElementById('chatStart');
+    if(!toggle || !panel) return;
+
+    function open(){ panel.classList.add('open'); toggle.setAttribute('aria-expanded','true'); }
+    function close(){ panel.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); }
+    toggle.addEventListener('click', function(){
+      panel.classList.contains('open') ? close() : open();
+      if(conversationId) loadMessages();
+    });
+    closeBtn.addEventListener('click', close);
+
+    function renderMessage(m){
+      var div = document.createElement('div');
+      div.className = 'chat-msg ' + (m.sender === 'admin' ? 'chat-msg-admin' : 'chat-msg-visitor');
+      div.textContent = m.message;
+      messagesEl.appendChild(div);
+    }
+
+    function loadMessages(){
+      if(!conversationId) return;
+      supa.from('chat_messages').select('*').eq('conversation_id', conversationId).order('created_at', {ascending:true})
+        .then(function(res){
+          messagesEl.innerHTML = '';
+          (res.data || []).forEach(renderMessage);
+          messagesEl.scrollTop = messagesEl.scrollHeight;
+        }, function(){});
+    }
+
+    function subscribeToReplies(){
+      if(!conversationId) return;
+      supa.channel('chat-' + conversationId)
+        .on('postgres_changes', {event:'INSERT', schema:'public', table:'chat_messages', filter:'conversation_id=eq.' + conversationId}, function(payload){
+          if(payload.new.sender === 'admin'){
+            renderMessage(payload.new);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+          }
+        })
+        .subscribe();
+    }
+
+    function startConversation(name, email){
+      supa.from('chat_conversations').insert({
+        visitor_name: name, visitor_email: email, session_id: sessionId
+      }).select().then(function(res){
+        if(res.data && res.data[0]){
+          conversationId = res.data[0].id;
+          try{ window.localStorage.setItem('cloaked-chat-conv-id', conversationId); }catch(e){}
+          preForm.style.display = 'none';
+          formEl.style.display = 'flex';
+          messagesEl.style.display = 'block';
+          renderMessage({sender:'admin', message:'Thanks for reaching out! Send us a message and our team will reply here as soon as possible.'});
+          subscribeToReplies();
+        }
+      }, function(){});
+    }
+
+    if(startBtn){
+      startBtn.addEventListener('click', function(){
+        var name = nameInput.value.trim();
+        if(!name) { nameInput.focus(); return; }
+        startConversation(name, emailInput.value.trim());
+      });
+    }
+
+    if(formEl){
+      formEl.addEventListener('submit', function(e){
+        e.preventDefault();
+        var text = inputEl.value.trim();
+        if(!text || !conversationId) return;
+        supa.from('chat_messages').insert({
+          conversation_id: conversationId, sender: 'visitor', message: text
+        }).then(function(){
+          renderMessage({sender:'visitor', message:text});
+          messagesEl.scrollTop = messagesEl.scrollHeight;
+          inputEl.value = '';
+        }, function(){});
+      });
+    }
+
+    // Resume an existing conversation if the visitor already started one
+    if(conversationId){
+      preForm.style.display = 'none';
+      formEl.style.display = 'flex';
+      messagesEl.style.display = 'block';
+      loadMessages();
+      subscribeToReplies();
+    }
+  }
+  initChatWidget();
 })();
 </script>
 
