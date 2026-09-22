@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin | Cloaked Innovations Limited</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+  :root{
+    --navy:#1B1D21; --teal:#12A3B3; --teal-deep:#0C8492; --teal-tint:#E3F6F8;
+    --plum:#5B2A72; --offwhite:#F5F6F8; --line:#E4E7EB; --ink:#1B1D21; --muted:#5B6570;
+    --white:#FFFFFF; --danger:#C4432D; --danger-tint:#FBEAE6; --success:#12A369; --success-tint:#E4F6EE;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--offwhite);color:var(--ink);font-family:'Inter',system-ui,sans-serif;}
+  a{color:var(--teal);}
+
+  /* ---------- Login screen ---------- */
+  #loginScreen{
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+  }
+  .login-box{
+    background:var(--white);border:1px solid var(--line);border-radius:14px;
+    padding:36px 32px;width:100%;max-width:380px;
+  }
+  .login-box h1{font-size:1.3rem;margin:0 0 6px;}
+  .login-box p{color:var(--muted);font-size:0.9rem;margin:0 0 24px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:0.85rem;font-weight:600;margin-bottom:6px;}
+  .field input, .field textarea, .field select{
+    width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;
+    font-family:inherit;font-size:0.92rem;background:var(--white);color:var(--ink);
+  }
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    background:var(--teal);color:#fff;border:none;border-radius:999px;
+    font-weight:600;font-size:0.88rem;padding:11px 20px;cursor:pointer;
+  }
+  .btn:hover{background:var(--teal-deep);}
+  .btn-block{width:100%;}
+  .btn-outline{background:transparent;border:1.5px solid var(--line);color:var(--ink);}
+  .btn-danger{background:var(--danger);}
+  .btn-sm{padding:7px 14px;font-size:0.8rem;}
+  #loginError{color:var(--danger);font-size:0.85rem;margin-top:10px;display:none;}
+  #configWarning{
+    display:none;background:#FFF6E5;border:1px solid #E8B84B;color:#7A5B12;
+    padding:14px 16px;border-radius:10px;font-size:0.85rem;max-width:480px;margin:0 auto 20px;
+  }
+
+  /* ---------- Dashboard shell ---------- */
+  #dashboard{display:none;min-height:100vh;}
+  .topbar{
+    background:var(--white);border-bottom:1px solid var(--line);
+    padding:14px 22px;display:flex;justify-content:space-between;align-items:center;
+    position:sticky;top:0;z-index:10;
+  }
+  .topbar strong{font-size:1rem;}
+  .layout{display:flex;min-height:calc(100vh - 57px);}
+  nav.sidebar{
+    width:210px;flex-shrink:0;background:var(--white);border-right:1px solid var(--line);
+    padding:14px 10px;
+  }
+  nav.sidebar button{
+    display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+    background:none;border:none;padding:11px 12px;border-radius:8px;
+    font-family:inherit;font-size:0.9rem;color:var(--ink);cursor:pointer;margin-bottom:2px;
+  }
+  nav.sidebar button:hover{background:var(--teal-tint);}
+  nav.sidebar button.active{background:var(--teal);color:#fff;font-weight:600;}
+  main.content{flex:1;padding:26px;overflow-x:auto;}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+  .tab-panel h2{margin:0 0 4px;font-size:1.3rem;}
+  .tab-sub{color:var(--muted);font-size:0.88rem;margin:0 0 20px;}
+
+  table{width:100%;border-collapse:collapse;background:var(--white);border:1px solid var(--line);border-radius:10px;overflow:hidden;}
+  thead{background:var(--offwhite);}
+  th, td{text-align:left;padding:10px 12px;font-size:0.86rem;border-bottom:1px solid var(--line);vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  .badge{display:inline-block;padding:3px 9px;border-radius:999px;font-size:0.72rem;font-weight:600;}
+  .badge-new{background:var(--teal-tint);color:var(--teal-deep);}
+  .badge-in_progress{background:#FFF6E5;color:#8A6212;}
+  .badge-quoted{background:#E7EEFB;color:#2E4E9E;}
+  .badge-won{background:var(--success-tint);color:var(--success);}
+  .badge-lost{background:var(--danger-tint);color:var(--danger);}
+  select.status-select{padding:5px 8px;font-size:0.78rem;border-radius:6px;border:1px solid var(--line);}
+
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:24px;}
+  .stat-card{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:16px 18px;}
+  .stat-card .num{font-size:1.6rem;font-weight:700;}
+  .stat-card .label{font-size:0.8rem;color:var(--muted);}
+
+  .card{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin-bottom:14px;}
+  .row-actions{display:flex;gap:8px;flex-wrap:wrap;}
+  .empty-state{color:var(--muted);font-size:0.9rem;padding:20px;text-align:center;}
+
+  .two-col{display:grid;grid-template-columns:280px 1fr;gap:16px;height:calc(100vh - 160px);}
+  .conv-list{background:var(--white);border:1px solid var(--line);border-radius:10px;overflow-y:auto;}
+  .conv-item{padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer;font-size:0.85rem;}
+  .conv-item:hover{background:var(--teal-tint);}
+  .conv-item.active{background:var(--teal);color:#fff;}
+  .conv-item small{display:block;color:inherit;opacity:0.7;font-size:0.75rem;}
+  .chat-window{background:var(--white);border:1px solid var(--line);border-radius:10px;display:flex;flex-direction:column;overflow:hidden;}
+  .chat-window-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;}
+  .chat-bubble{max-width:70%;padding:9px 13px;border-radius:12px;font-size:0.86rem;}
+  .chat-bubble-visitor{align-self:flex-start;background:var(--offwhite);}
+  .chat-bubble-admin{align-self:flex-end;background:var(--teal);color:#fff;}
+  .chat-window-form{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line);}
+  .chat-window-form input{flex:1;padding:10px 12px;border:1.5px solid var(--line);border-radius:999px;font-family:inherit;}
+
+  #toast{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    background:var(--ink);color:#fff;padding:11px 20px;border-radius:8px;font-size:0.86rem;
+    display:none;z-index:200;
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<div id="loginScreen">
+  <div style="width:100%;">
+    <div id="configWarning">
+      <strong>Setup needed:</strong> this page doesn't have Supabase credentials configured yet. Open admin.html, find <code>SUPABASE_URL</code> and <code>SUPABASE_ANON_KEY</code> near the top of the script, and fill in your project's values from Supabase → Settings → API.
+    </div>
+    <div class="login-box">
+      <h1>Admin Login</h1>
+      <p>Cloaked Innovations Limited — internal dashboard</p>
+      <div class="field">
+        <label for="loginEmail">Email</label>
+        <input type="email" id="loginEmail" autocomplete="username">
+      </div>
+      <div class="field">
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" autocomplete="current-password">
+      </div>
+      <button class="btn btn-block" id="loginBtn">Log In</button>
+      <div id="loginError">Incorrect email or password, or this account isn't authorized for admin access.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ DASHBOARD ============ -->
+<div id="dashboard">
+  <div class="topbar">
+    <strong>Cloaked Innovations — Admin</strong>
+    <button class="btn btn-outline btn-sm" id="logoutBtn">Log Out</button>
+  </div>
+  <div class="layout">
+    <nav class="sidebar">
+      <button data-tab="overview" class="active">Overview</button>
+      <button data-tab="customers">Customers</button>
+      <button data-tab="orders">Orders</button>
+      <button data-tab="followups">Follow-ups</button>
+      <button data-tab="testimonials">Testimonials</button>
+      <button data-tab="chat">Chat Inbox</button>
+      <button data-tab="analytics">Analytics</button>
+      <button data-tab="email">Email Customer</button>
+    </nav>
+    <main class="content">
+
+      <!-- OVERVIEW -->
+      <section class="tab-panel active" id="tab-overview">
+        <h2>Overview</h2>
+        <p class="tab-sub">A quick snapshot across everything.</p>
+        <div class="stat-grid" id="overviewStats"></div>
+        <div class="card">
+          <strong>Recent orders</strong>
+          <div id="overviewRecentOrders" style="margin-top:10px;"></div>
+        </div>
+      </section>
+
+      <!-- CUSTOMERS -->
+      <section class="tab-panel" id="tab-customers">
+        <h2>Customers</h2>
+        <p class="tab-sub">Everyone who has submitted an enquiry, plus anyone you add manually.</p>
+        <div class="card">
+          <strong>Add a customer</strong>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:10px;margin-top:10px;align-items:end;">
+            <div class="field" style="margin:0;"><label>Name</label><input type="text" id="newCustName"></div>
+            <div class="field" style="margin:0;"><label>Organisation</label><input type="text" id="newCustOrg"></div>
+            <div class="field" style="margin:0;"><label>Email</label><input type="email" id="newCustEmail"></div>
+            <div class="field" style="margin:0;"><label>Phone</label><input type="text" id="newCustPhone"></div>
+            <button class="btn btn-sm" id="addCustomerBtn">Add</button>
+          </div>
+        </div>
+        <div id="customersTableWrap"></div>
+      </section>
+
+      <!-- ORDERS -->
+      <section class="tab-panel" id="tab-orders">
+        <h2>Orders &amp; Enquiries</h2>
+        <p class="tab-sub">Every quotation request, from the website form or added manually.</p>
+        <div id="ordersTableWrap"></div>
+      </section>
+
+      <!-- FOLLOWUPS -->
+      <section class="tab-panel" id="tab-followups">
+        <h2>Follow-ups</h2>
+        <p class="tab-sub">Tasks and reminders tied to a customer.</p>
+        <div class="card">
+          <strong>Add a follow-up</strong>
+          <div style="display:grid;grid-template-columns:1fr 2fr 1fr auto;gap:10px;margin-top:10px;align-items:end;">
+            <div class="field" style="margin:0;"><label>Customer</label><select id="newFollowupCustomer"></select></div>
+            <div class="field" style="margin:0;"><label>Note</label><input type="text" id="newFollowupNote"></div>
+            <div class="field" style="margin:0;"><label>Due date</label><input type="date" id="newFollowupDate"></div>
+            <button class="btn btn-sm" id="addFollowupBtn">Add</button>
+          </div>
+        </div>
+        <div id="followupsTableWrap"></div>
+      </section>
+
+      <!-- TESTIMONIALS -->
+      <section class="tab-panel" id="tab-testimonials">
+        <h2>Testimonials</h2>
+        <p class="tab-sub">Add a testimonial whenever a customer sends one in (email, call, WhatsApp). Approved ones show on the live site automatically.</p>
+        <div class="card">
+          <strong>Add a testimonial</strong>
+          <div class="field"><label>Customer name</label><input type="text" id="newTestiName"></div>
+          <div class="field"><label>Organisation (optional)</label><input type="text" id="newTestiOrg"></div>
+          <div class="field"><label>Quote</label><textarea id="newTestiQuote" rows="3"></textarea></div>
+          <label style="display:flex;align-items:center;gap:8px;font-size:0.88rem;margin-bottom:12px;">
+            <input type="checkbox" id="newTestiApproved" checked> Show on live site immediately
+          </label>
+          <button class="btn btn-sm" id="addTestimonialBtn">Add Testimonial</button>
+        </div>
+        <div id="testimonialsTableWrap"></div>
+      </section>
+
+      <!-- CHAT INBOX -->
+      <section class="tab-panel" id="tab-chat">
+        <h2>Chat Inbox</h2>
+        <p class="tab-sub">Messages from visitors using the live chat widget on the site.</p>
+        <div class="two-col">
+          <div class="conv-list" id="convList"></div>
+          <div class="chat-window">
+            <div class="chat-window-messages" id="chatWindowMessages">
+              <div class="empty-state">Select a conversation to view messages.</div>
+            </div>
+            <form class="chat-window-form" id="adminChatForm" style="display:none;">
+              <input type="text" id="adminChatInput" placeholder="Type a reply&hellip;" autocomplete="off">
+              <button type="submit" class="btn btn-sm">Send</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- ANALYTICS -->
+      <section class="tab-panel" id="tab-analytics">
+        <h2>Analytics</h2>
+        <p class="tab-sub">Basic pageview counts &mdash; no third-party tracking.</p>
+        <div class="stat-grid" id="analyticsStats"></div>
+        <div class="card">
+          <strong>Pageviews by page (last 30 days)</strong>
+          <div id="analyticsByPage" style="margin-top:10px;"></div>
+        </div>
+        <div class="card">
+          <strong>Pageviews per day (last 14 days)</strong>
+          <div id="analyticsByDay" style="margin-top:10px;"></div>
+        </div>
+      </section>
+
+      <!-- EMAIL CUSTOMER -->
+      <section class="tab-panel" id="tab-email">
+        <h2>Email a Customer</h2>
+        <p class="tab-sub">Sends a real email via your Resend account (requires the /api/send-email function to be deployed with RESEND_API_KEY set in Vercel).</p>
+        <div class="card" style="max-width:560px;">
+          <div class="field">
+            <label>Customer</label>
+            <select id="emailCustomerSelect"></select>
+          </div>
+          <div class="field">
+            <label>To (auto-filled, editable)</label>
+            <input type="email" id="emailTo">
+          </div>
+          <div class="field">
+            <label>Subject</label>
+            <input type="text" id="emailSubject">
+          </div>
+          <div class="field">
+            <label>Message</label>
+            <textarea id="emailBody" rows="8"></textarea>
+          </div>
+          <button class="btn" id="sendEmailBtn">Send Email</button>
+          <div id="emailStatus" style="margin-top:10px;font-size:0.85rem;"></div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function(){
+  // ============================================================
+  // SUPABASE CONFIG — same values as in index.html
+  // ============================================================
+  var SUPABASE_URL = "https://swguesxklmbfwanxzjjt.supabase.co";
+  var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3Z3Vlc3hrbG1iZndhbnh6amp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MzQ3OTIsImV4cCI6MjEwNTUxMDc5Mn0.N6636rHeofqQl_sNylzVgIKrno5jpWQmrNwS3OHh488";
+  var ADMIN_EMAIL = "cloakedsolutionsltd@gmail.com"; // must match the email in supabase-schema.sql policies
+
+  if (SUPABASE_URL.indexOf("YOUR_SUPABASE") !== -1) {
+    document.getElementById('configWarning').style.display = 'block';
+  }
+  var supa = (window.supabase && SUPABASE_URL.indexOf("YOUR_SUPABASE") === -1)
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+  function toast(msg){
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    setTimeout(function(){ t.style.display = 'none'; }, 2600);
+  }
+
+  // ---------- Auth ----------
+  var loginScreen = document.getElementById('loginScreen');
+  var dashboard = document.getElementById('dashboard');
+
+  function checkSession(){
+    if(!supa) return;
+    supa.auth.getSession().then(function(res){
+      var session = res.data.session;
+      if(session && session.user && session.user.email === ADMIN_EMAIL){
+        showDashboard();
+      }
+    });
+  }
+
+  document.getElementById('loginBtn').addEventListener('click', function(){
+    if(!supa){ toast('Supabase is not configured yet.'); return; }
+    var email = document.getElementById('loginEmail').value.trim();
+    var password = document.getElementById('loginPassword').value;
+    supa.auth.signInWithPassword({email: email, password: password}).then(function(res){
+      if(res.error || !res.data.user || res.data.user.email !== ADMIN_EMAIL){
+        document.getElementById('loginError').style.display = 'block';
+        if(res.data && res.data.user && res.data.user.email !== ADMIN_EMAIL){
+          supa.auth.signOut();
+        }
+        return;
+      }
+      document.getElementById('loginError').style.display = 'none';
+      showDashboard();
+    });
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', function(){
+    supa.auth.signOut().then(function(){
+      location.reload();
+    });
+  });
+
+  function showDashboard(){
+    loginScreen.style.display = 'none';
+    dashboard.style.display = 'block';
+    loadAllTabs();
+  }
+
+  checkSession();
+
+  // ---------- Tab switching ----------
+  var tabButtons = document.querySelectorAll('nav.sidebar button');
+  tabButtons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      tabButtons.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+      document.getElementById('tab-' + btn.getAttribute('data-tab')).classList.add('active');
+    });
+  });
+
+  function esc(s){ return (s == null ? '' : String(s)).replace(/</g,'&lt;'); }
+  function fmtDate(s){ if(!s) return '—'; var d = new Date(s); return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); }
+
+  // ============================================================
+  // CUSTOMERS
+  // ============================================================
+  var customersCache = [];
+
+  function loadCustomers(){
+    supa.from('customers').select('*').order('created_at', {ascending:false}).then(function(res){
+      customersCache = res.data || [];
+      renderCustomersTable();
+      populateCustomerSelects();
+    });
+  }
+
+  function renderCustomersTable(){
+    var wrap = document.getElementById('customersTableWrap');
+    if(customersCache.length === 0){ wrap.innerHTML = '<div class="empty-state">No customers yet.</div>'; return; }
+    var rows = customersCache.map(function(c){
+      return '<tr><td>' + esc(c.full_name) + '</td><td>' + esc(c.organisation) + '</td><td>' + esc(c.email) + '</td><td>' + esc(c.phone) + '</td><td>' + fmtDate(c.created_at) + '</td></tr>';
+    }).join('');
+    wrap.innerHTML = '<table><thead><tr><th>Name</th><th>Organisation</th><th>Email</th><th>Phone</th><th>Added</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  }
+
+  document.getElementById('addCustomerBtn').addEventListener('click', function(){
+    var name = document.getElementById('newCustName').value.trim();
+    if(!name){ toast('Name is required.'); return; }
+    supa.from('customers').insert({
+      full_name: name,
+      organisation: document.getElementById('newCustOrg').value.trim(),
+      email: document.getElementById('newCustEmail').value.trim(),
+      phone: document.getElementById('newCustPhone').value.trim()
+    }).then(function(res){
+      if(res.error){ toast('Could not add customer.'); return; }
+      toast('Customer added.');
+      ['newCustName','newCustOrg','newCustEmail','newCustPhone'].forEach(function(id){ document.getElementById(id).value=''; });
+      loadCustomers();
+    });
+  });
+
+  function populateCustomerSelects(){
+    var opts = '<option value="">Select a customer&hellip;</option>' + customersCache.map(function(c){
+      return '<option value="' + c.id + '">' + esc(c.full_name) + (c.organisation ? ' (' + esc(c.organisation) + ')' : '') + '</option>';
+    }).join('');
+    ['newFollowupCustomer','emailCustomerSelect'].forEach(function(id){
+      var el = document.getElementById(id);
+      var current = el.value;
+      el.innerHTML = opts;
+      el.value = current;
+    });
+  }
+
+  document.getElementById('emailCustomerSelect').addEventListener('change', function(){
+    var sel = this;
+    var c = customersCache.find(function(x){ return x.id === sel.value; });
+    if(c) document.getElementById('emailTo').value = c.email || '';
+  });
+
+  // ============================================================
+  // ORDERS
+  // ============================================================
+  function loadOrders(){
+    supa.from('orders').select('*, customers(full_name, organisation)').order('created_at', {ascending:false}).then(function(res){
+      renderOrdersTable(res.data || []);
+      renderOverviewRecentOrders(res.data || []);
+    });
+  }
+
+  function renderOrdersTable(orders){
+    var wrap = document.getElementById('ordersTableWrap');
+    if(orders.length === 0){ wrap.innerHTML = '<div class="empty-state">No orders yet.</div>'; return; }
+    var rows = orders.map(function(o){
+      var custName = o.customers ? esc(o.customers.full_name) + (o.customers.organisation ? ' — ' + esc(o.customers.organisation) : '') : '—';
+      return '<tr><td>' + custName + '</td><td>' + esc(o.subject) + '</td><td>' + esc(o.product_needed) + '</td><td>' + esc(o.quantity) + '</td>' +
+        '<td><select class="status-select" data-order="' + o.id + '">' +
+        ['new','in_progress','quoted','won','lost'].map(function(s){ return '<option value="' + s + '"' + (s===o.status?' selected':'') + '>' + s.replace('_',' ') + '</option>'; }).join('') +
+        '</select></td><td>' + fmtDate(o.created_at) + '</td></tr>';
+    }).join('');
+    wrap.innerHTML = '<table><thead><tr><th>Customer</th><th>Subject</th><th>Product</th><th>Qty</th><th>Status</th><th>Received</th></tr></thead><tbody>' + rows + '</tbody></table>';
+    wrap.querySelectorAll('.status-select').forEach(function(sel){
+      sel.addEventListener('change', function(){
+        supa.from('orders').update({status: sel.value, updated_at: new Date().toISOString()}).eq('id', sel.getAttribute('data-order')).then(function(){
+          toast('Status updated.');
+        });
+      });
+    });
+  }
+
+  function renderOverviewRecentOrders(orders){
+    var wrap = document.getElementById('overviewRecentOrders');
+    var recent = orders.slice(0, 5);
+    if(recent.length === 0){ wrap.innerHTML = '<div class="empty-state">No orders yet.</div>'; return; }
+    wrap.innerHTML = recent.map(function(o){
+      var custName = o.customers ? esc(o.customers.full_name) : 'Unknown';
+      return '<div style="padding:8px 0;border-bottom:1px solid var(--line);font-size:0.86rem;">' +
+        '<strong>' + custName + '</strong> — ' + esc(o.subject) + ' <span class="badge badge-' + o.status + '">' + o.status.replace('_',' ') + '</span>' +
+        '<div style="color:var(--muted);font-size:0.78rem;">' + fmtDate(o.created_at) + '</div></div>';
+    }).join('');
+  }
+
+  // ============================================================
+  // FOLLOW-UPS
+  // ============================================================
+  function loadFollowups(){
+    supa.from('followups').select('*, customers(full_name)').order('due_date', {ascending:true}).then(function(res){
+      renderFollowupsTable(res.data || []);
+    });
+  }
+
+  function renderFollowupsTable(items){
+    var wrap = document.getElementById('followupsTableWrap');
+    if(items.length === 0){ wrap.innerHTML = '<div class="empty-state">No follow-ups yet.</div>'; return; }
+    var rows = items.map(function(f){
+      var custName = f.customers ? esc(f.customers.full_name) : '—';
+      return '<tr><td>' + custName + '</td><td>' + esc(f.note) + '</td><td>' + (f.due_date || '—') + '</td>' +
+        '<td><input type="checkbox" data-followup="' + f.id + '" ' + (f.done ? 'checked' : '') + '></td></tr>';
+    }).join('');
+    wrap.innerHTML = '<table><thead><tr><th>Customer</th><th>Note</th><th>Due</th><th>Done</th></tr></thead><tbody>' + rows + '</tbody></table>';
+    wrap.querySelectorAll('[data-followup]').forEach(function(cb){
+      cb.addEventListener('change', function(){
+        supa.from('followups').update({done: cb.checked}).eq('id', cb.getAttribute('data-followup')).then(function(){
+          toast('Follow-up updated.');
+        });
+      });
+    });
+  }
+
+  document.getElementById('addFollowupBtn').addEventListener('click', function(){
+    var customerId = document.getElementById('newFollowupCustomer').value;
+    var note = document.getElementById('newFollowupNote').value.trim();
+    if(!customerId || !note){ toast('Customer and note are required.'); return; }
+    supa.from('followups').insert({
+      customer_id: customerId, note: note,
+      due_date: document.getElementById('newFollowupDate').value || null
+    }).then(function(res){
+      if(res.error){ toast('Could not add follow-up.'); return; }
+      toast('Follow-up added.');
+      document.getElementById('newFollowupNote').value = '';
+      document.getElementById('newFollowupDate').value = '';
+      loadFollowups();
+    });
+  });
+
+  // ============================================================
+  // TESTIMONIALS
+  // ============================================================
+  function loadTestimonials(){
+    supa.from('testimonials').select('*').order('created_at', {ascending:false}).then(function(res){
+      renderTestimonialsTable(res.data || []);
+    });
+  }
+
+  function renderTestimonialsTable(items){
+    var wrap = document.getElementById('testimonialsTableWrap');
+    if(items.length === 0){ wrap.innerHTML = '<div class="empty-state">No testimonials yet.</div>'; return; }
+    var rows = items.map(function(t){
+      return '<tr><td>' + esc(t.customer_name) + '</td><td>' + esc(t.organisation) + '</td><td style="max-width:340px;">' + esc(t.quote) + '</td>' +
+        '<td><input type="checkbox" data-testi="' + t.id + '" ' + (t.approved ? 'checked' : '') + '> Live</td>' +
+        '<td><button class="btn btn-sm btn-danger" data-del-testi="' + t.id + '">Delete</button></td></tr>';
+    }).join('');
+    wrap.innerHTML = '<table><thead><tr><th>Name</th><th>Org</th><th>Quote</th><th>Approved</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
+    wrap.querySelectorAll('[data-testi]').forEach(function(cb){
+      cb.addEventListener('change', function(){
+        supa.from('testimonials').update({approved: cb.checked}).eq('id', cb.getAttribute('data-testi')).then(function(){
+          toast(cb.checked ? 'Now live on site.' : 'Removed from site.');
+        });
+      });
+    });
+    wrap.querySelectorAll('[data-del-testi]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        if(!confirm('Delete this testimonial?')) return;
+        supa.from('testimonials').delete().eq('id', btn.getAttribute('data-del-testi')).then(function(){
+          toast('Deleted.'); loadTestimonials();
+        });
+      });
+    });
+  }
+
+  document.getElementById('addTestimonialBtn').addEventListener('click', function(){
+    var name = document.getElementById('newTestiName').value.trim();
+    var quote = document.getElementById('newTestiQuote').value.trim();
+    if(!name || !quote){ toast('Name and quote are required.'); return; }
+    supa.from('testimonials').insert({
+      customer_name: name,
+      organisation: document.getElementById('newTestiOrg').value.trim(),
+      quote: quote,
+      approved: document.getElementById('newTestiApproved').checked
+    }).then(function(res){
+      if(res.error){ toast('Could not add testimonial.'); return; }
+      toast('Testimonial added.');
+      ['newTestiName','newTestiOrg','newTestiQuote'].forEach(function(id){ document.getElementById(id).value=''; });
+      loadTestimonials();
+    });
+  });
+
+  // ============================================================
+  // CHAT INBOX
+  // ============================================================
+  var activeConvId = null;
+
+  function loadConversations(){
+    supa.from('chat_conversations').select('*').order('last_message_at', {ascending:false}).then(function(res){
+      renderConvList(res.data || []);
+    });
+  }
+
+  function renderConvList(convs){
+    var wrap = document.getElementById('convList');
+    if(convs.length === 0){ wrap.innerHTML = '<div class="empty-state">No conversations yet.</div>'; return; }
+    wrap.innerHTML = convs.map(function(c){
+      return '<div class="conv-item" data-conv="' + c.id + '"><strong>' + esc(c.visitor_name || 'Visitor') + '</strong>' +
+        '<small>' + esc(c.visitor_email || '') + '</small><small>' + fmtDate(c.last_message_at) + '</small></div>';
+    }).join('');
+    wrap.querySelectorAll('.conv-item').forEach(function(item){
+      item.addEventListener('click', function(){
+        wrap.querySelectorAll('.conv-item').forEach(function(i){ i.classList.remove('active'); });
+        item.classList.add('active');
+        openConversation(item.getAttribute('data-conv'));
+      });
+    });
+  }
+
+  function openConversation(convId){
+    activeConvId = convId;
+    document.getElementById('adminChatForm').style.display = 'flex';
+    supa.from('chat_messages').select('*').eq('conversation_id', convId).order('created_at', {ascending:true}).then(function(res){
+      renderChatWindow(res.data || []);
+    });
+    supa.channel('admin-chat-' + convId)
+      .on('postgres_changes', {event:'INSERT', schema:'public', table:'chat_messages', filter:'conversation_id=eq.' + convId}, function(payload){
+        if(activeConvId === convId && payload.new.sender === 'visitor'){
+          appendChatBubble(payload.new);
+        }
+      }).subscribe();
+  }
+
+  function renderChatWindow(messages){
+    var wrap = document.getElementById('chatWindowMessages');
+    wrap.innerHTML = '';
+    if(messages.length === 0){ wrap.innerHTML = '<div class="empty-state">No messages yet.</div>'; return; }
+    messages.forEach(appendChatBubble);
+  }
+
+  function appendChatBubble(m){
+    var wrap = document.getElementById('chatWindowMessages');
+    if(wrap.querySelector('.empty-state')) wrap.innerHTML = '';
+    var div = document.createElement('div');
+    div.className = 'chat-bubble ' + (m.sender === 'admin' ? 'chat-bubble-admin' : 'chat-bubble-visitor');
+    div.textContent = m.message;
+    wrap.appendChild(div);
+    wrap.scrollTop = wrap.scrollHeight;
+  }
+
+  document.getElementById('adminChatForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    if(!activeConvId) return;
+    var input = document.getElementById('adminChatInput');
+    var text = input.value.trim();
+    if(!text) return;
+    supa.from('chat_messages').insert({conversation_id: activeConvId, sender: 'admin', message: text}).then(function(res){
+      if(!res.error){
+        supa.from('chat_conversations').update({last_message_at: new Date().toISOString()}).eq('id', activeConvId).then(function(){});
+        appendChatBubble({sender:'admin', message:text});
+        input.value = '';
+      }
+    });
+  });
+
+  // ============================================================
+  // ANALYTICS
+  // ============================================================
+  function loadAnalytics(){
+    var since30 = new Date(Date.now() - 30*24*60*60*1000).toISOString();
+
+    supa.from('page_views').select('page, session_id, created_at').gte('created_at', since30).then(function(res){
+      var rows = res.data || [];
+      var totalViews = rows.length;
+      var uniqueSessions = new Set(rows.map(function(r){ return r.session_id; })).size;
+
+      document.getElementById('analyticsStats').innerHTML =
+        '<div class="stat-card"><div class="num">' + totalViews + '</div><div class="label">Pageviews (30 days)</div></div>' +
+        '<div class="stat-card"><div class="num">' + uniqueSessions + '</div><div class="label">Unique visitors (30 days)</div></div>';
+
+      var byPage = {};
+      rows.forEach(function(r){ byPage[r.page] = (byPage[r.page]||0) + 1; });
+      var pageRows = Object.keys(byPage).sort(function(a,b){ return byPage[b]-byPage[a]; }).map(function(p){
+        return '<tr><td>' + esc(p) + '</td><td>' + byPage[p] + '</td></tr>';
+      }).join('');
+      document.getElementById('analyticsByPage').innerHTML = pageRows
+        ? '<table><thead><tr><th>Page</th><th>Views</th></tr></thead><tbody>' + pageRows + '</tbody></table>'
+        : '<div class="empty-state">No data yet.</div>';
+
+      var since14str = new Date(Date.now() - 14*24*60*60*1000).toISOString();
+      var byDay = {};
+      rows.filter(function(r){ return r.created_at >= since14str; }).forEach(function(r){
+        var day = r.created_at.slice(0,10);
+        byDay[day] = (byDay[day]||0) + 1;
+      });
+      var dayKeys = Object.keys(byDay).sort();
+      var dayRows = dayKeys.map(function(d){ return '<tr><td>' + d + '</td><td>' + byDay[d] + '</td></tr>'; }).join('');
+      document.getElementById('analyticsByDay').innerHTML = dayRows
+        ? '<table><thead><tr><th>Date</th><th>Views</th></tr></thead><tbody>' + dayRows + '</tbody></table>'
+        : '<div class="empty-state">No data yet.</div>';
+    });
+  }
+
+  // ============================================================
+  // OVERVIEW STATS
+  // ============================================================
+  function loadOverviewStats(){
+    Promise.all([
+      supa.from('customers').select('id', {count:'exact', head:true}),
+      supa.from('orders').select('id', {count:'exact', head:true}),
+      supa.from('orders').select('id', {count:'exact', head:true}).eq('status','new'),
+      supa.from('followups').select('id', {count:'exact', head:true}).eq('done', false),
+      supa.from('testimonials').select('id', {count:'exact', head:true}).eq('approved', true)
+    ]).then(function(results){
+      var labels = ['Customers','Total Orders','New Orders','Open Follow-ups','Live Testimonials'];
+      document.getElementById('overviewStats').innerHTML = results.map(function(r,i){
+        return '<div class="stat-card"><div class="num">' + (r.count||0) + '</div><div class="label">' + labels[i] + '</div></div>';
+      }).join('');
+    });
+  }
+
+  // ============================================================
+  // EMAIL CUSTOMER
+  // ============================================================
+  document.getElementById('sendEmailBtn').addEventListener('click', function(){
+    var to = document.getElementById('emailTo').value.trim();
+    var subject = document.getElementById('emailSubject').value.trim();
+    var body = document.getElementById('emailBody').value.trim();
+    var statusEl = document.getElementById('emailStatus');
+    if(!to || !subject || !body){ statusEl.textContent = 'Please fill in recipient, subject and message.'; statusEl.style.color = 'var(--danger)'; return; }
+    statusEl.textContent = 'Sending…'; statusEl.style.color = 'var(--muted)';
+    fetch('/api/send-email', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({to: to, subject: subject, body: body})
+    }).then(function(r){ return r.json().then(function(data){ return {ok: r.ok, data: data}; }); })
+      .then(function(res){
+        if(res.ok){
+          statusEl.textContent = 'Email sent.'; statusEl.style.color = 'var(--success)';
+          document.getElementById('emailSubject').value = '';
+          document.getElementById('emailBody').value = '';
+        } else {
+          statusEl.textContent = 'Failed to send: ' + (res.data.error || 'unknown error. Is /api/send-email deployed with RESEND_API_KEY set?');
+          statusEl.style.color = 'var(--danger)';
+        }
+      }).catch(function(){
+        statusEl.textContent = 'Could not reach /api/send-email — is it deployed on Vercel?';
+        statusEl.style.color = 'var(--danger)';
+      });
+  });
+
+  // ============================================================
+  function loadAllTabs(){
+    loadCustomers();
+    loadOrders();
+    loadFollowups();
+    loadTestimonials();
+    loadConversations();
+    loadAnalytics();
+    loadOverviewStats();
+  }
+})();
+</script>
+</body>
+</html>
