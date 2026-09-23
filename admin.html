@@ -268,6 +268,13 @@
         <p class="tab-sub">Sends a real email via your Resend account (requires the /api/send-email function to be deployed with RESEND_API_KEY set in Vercel).</p>
         <div class="card" style="max-width:560px;">
           <div class="field">
+            <label>Send as</label>
+            <select id="emailPurpose">
+              <option value="general">General — Cloaked Innovations Limited (info@)</option>
+              <option value="support">Support — Cloaked Innovations Limited Support (support@)</option>
+            </select>
+          </div>
+          <div class="field">
             <label>Customer</label>
             <select id="emailCustomerSelect"></select>
           </div>
@@ -704,13 +711,14 @@
     var to = document.getElementById('emailTo').value.trim();
     var subject = document.getElementById('emailSubject').value.trim();
     var body = document.getElementById('emailBody').value.trim();
+    var purpose = document.getElementById('emailPurpose').value;
     var statusEl = document.getElementById('emailStatus');
     if(!to || !subject || !body){ statusEl.textContent = 'Please fill in recipient, subject and message.'; statusEl.style.color = 'var(--danger)'; return; }
     statusEl.textContent = 'Sending…'; statusEl.style.color = 'var(--muted)';
     fetch('/api/send-email', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({to: to, subject: subject, body: body})
+      body: JSON.stringify({to: to, subject: subject, body: body, purpose: purpose})
     }).then(function(r){ return r.json().then(function(data){ return {ok: r.ok, data: data}; }); })
       .then(function(res){
         if(res.ok){
