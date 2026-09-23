@@ -157,6 +157,7 @@
       <button data-tab="testimonials">Testimonials</button>
       <button data-tab="chat">Chat Inbox</button>
       <button data-tab="analytics">Analytics</button>
+      <button data-tab="mailbox">Mailbox</button>
       <button data-tab="email">Email Customer</button>
     </nav>
     <main class="content">
@@ -259,6 +260,26 @@
         <div class="card">
           <strong>Pageviews per day (last 14 days)</strong>
           <div id="analyticsByDay" style="margin-top:10px;"></div>
+        </div>
+      </section>
+
+      <!-- MAILBOX -->
+      <section class="tab-panel" id="tab-mailbox">
+        <h2>Mailbox</h2>
+        <p class="tab-sub">Emails received at info@ and support@ &mdash; requires the Resend webhook to be set up (see README).</p>
+        <div class="two-col">
+          <div class="conv-list" id="mailboxList"></div>
+          <div class="chat-window" style="overflow-y:auto;">
+            <div id="mailboxReader" style="padding:20px;flex:1;">
+              <div class="empty-state">Select a message to read it.</div>
+            </div>
+            <form id="mailboxReplyForm" style="display:none;padding:16px;border-top:1px solid var(--line);flex-direction:column;gap:10px;">
+              <input type="text" id="mailboxReplySubject" placeholder="Subject">
+              <textarea id="mailboxReplyBody" rows="5" placeholder="Write a reply&hellip;" style="padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;font-family:inherit;font-size:0.88rem;"></textarea>
+              <button type="submit" class="btn btn-sm" style="align-self:flex-start;">Send Reply</button>
+              <div id="mailboxReplyStatus" style="font-size:0.82rem;"></div>
+            </form>
+          </div>
         </div>
       </section>
 
@@ -705,6 +726,97 @@
   }
 
   // ============================================================
+  // MAILBOX
+  // ============================================================
+  var mailboxCache = [];
+  var activeMailboxId = null;
+
+  function loadMailbox(){
+    supa.from('inbox_messages').select('*').order('created_at', {ascending:false}).then(function(res){
+      mailboxCache = res.data || [];
+      renderMailboxList();
+    });
+  }
+
+  function renderMailboxList(){
+    var wrap = document.getElementById('mailboxList');
+    if(mailboxCache.length === 0){ wrap.innerHTML = '<div class="empty-state">No messages yet.</div>'; return; }
+    wrap.innerHTML = mailboxCache.map(function(m){
+      return '<div class="conv-item" data-mail="' + m.id + '" style="' + (m.is_read ? '' : 'font-weight:700;') + '">' +
+        esc(m.from_address) +
+        '<small>' + esc(m.subject || '(no subject)') + '</small>' +
+        '<small>' + esc(m.to_address) + ' &middot; ' + fmtDate(m.created_at) + '</small></div>';
+    }).join('');
+    wrap.querySelectorAll('.conv-item').forEach(function(item){
+      item.addEventListener('click', function(){
+        wrap.querySelectorAll('.conv-item').forEach(function(i){ i.classList.remove('active'); });
+        item.classList.add('active');
+        openMailboxMessage(item.getAttribute('data-mail'));
+      });
+    });
+  }
+
+  function openMailboxMessage(id){
+    activeMailboxId = id;
+    var msg = mailboxCache.find(function(m){ return m.id === id; });
+    if(!msg) return;
+
+    var reader = document.getElementById('mailboxReader');
+    reader.innerHTML =
+      '<div style="margin-bottom:14px;">' +
+        '<strong style="font-size:1.05rem;">' + esc(msg.subject || '(no subject)') + '</strong><br>' +
+        '<span style="color:var(--muted);font-size:0.85rem;">From: ' + esc(msg.from_address) + ' &middot; To: ' + esc(msg.to_address) + ' &middot; ' + fmtDate(msg.created_at) + '</span>' +
+      '</div>' +
+      '<div style="font-size:0.9rem;white-space:pre-wrap;line-height:1.6;">' + esc(msg.body_text || '(no text content)') + '</div>';
+
+    var replyForm = document.getElementById('mailboxReplyForm');
+    replyForm.style.display = 'flex';
+    document.getElementById('mailboxReplySubject').value = 'Re: ' + (msg.subject || '');
+    document.getElementById('mailboxReplyBody').value = '';
+    document.getElementById('mailboxReplyStatus').textContent = '';
+
+    if(!msg.is_read){
+      supa.from('inbox_messages').update({is_read: true}).eq('id', id).then(function(){
+        msg.is_read = true;
+        renderMailboxList();
+      });
+    }
+  }
+
+  document.getElementById('mailboxReplyForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var msg = mailboxCache.find(function(m){ return m.id === activeMailboxId; });
+    if(!msg) return;
+    var subject = document.getElementById('mailboxReplySubject').value.trim();
+    var body = document.getElementById('mailboxReplyBody').value.trim();
+    var statusEl = document.getElementById('mailboxReplyStatus');
+    if(!body){ statusEl.textContent = 'Write a reply first.'; statusEl.style.color = 'var(--danger)'; return; }
+
+    var purpose = (msg.to_address || '').indexOf('support@') !== -1 ? 'support' : 'general';
+    statusEl.textContent = 'Sending…'; statusEl.style.color = 'var(--muted)';
+    fetch('/api/send-email', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        to: msg.from_address, subject: subject, body: body,
+        purpose: purpose, inReplyTo: msg.message_id
+      })
+    }).then(function(r){ return r.json().then(function(data){ return {ok: r.ok, data: data}; }); })
+      .then(function(res){
+        if(res.ok){
+          statusEl.textContent = 'Reply sent.'; statusEl.style.color = 'var(--success)';
+          document.getElementById('mailboxReplyBody').value = '';
+        } else {
+          statusEl.textContent = 'Failed: ' + (res.data.error || 'unknown error.');
+          statusEl.style.color = 'var(--danger)';
+        }
+      }).catch(function(){
+        statusEl.textContent = 'Could not reach /api/send-email.';
+        statusEl.style.color = 'var(--danger)';
+      });
+  });
+
+  // ============================================================
   // EMAIL CUSTOMER
   // ============================================================
   document.getElementById('sendEmailBtn').addEventListener('click', function(){
@@ -744,6 +856,7 @@
     loadConversations();
     loadAnalytics();
     loadOverviewStats();
+    loadMailbox();
   }
 })();
 </script>
