@@ -25,7 +25,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { to, subject, body, purpose } = req.body || {};
+  const { to, subject, body, purpose, inReplyTo } = req.body || {};
 
   if (!to || !subject || !body) {
     return res.status(400).json({ error: 'Missing required fields: to, subject, body' });
@@ -45,6 +45,22 @@ export default async function handler(req, res) {
     ? (process.env.SUPPORT_REPLY_TO || 'cloakedsolutionsltd@gmail.com')
     : (process.env.GENERAL_REPLY_TO || 'cloakedsolutionsltd@gmail.com');
 
+  const payload = {
+    from: fromEmail,
+    to: [to],
+    subject: subject,
+    text: body,
+    reply_to: replyTo
+  };
+  // If replying to a received message, thread it properly in the
+  // recipient's mail client using the standard email headers.
+  if (inReplyTo) {
+    payload.headers = {
+      'In-Reply-To': inReplyTo,
+      'References': inReplyTo
+    };
+  }
+
   try {
     const resendRes = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -52,13 +68,7 @@ export default async function handler(req, res) {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        from: fromEmail,
-        to: [to],
-        subject: subject,
-        text: body,
-        reply_to: replyTo
-      })
+      body: JSON.stringify(payload)
     });
 
     const data = await resendRes.json();
