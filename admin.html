@@ -137,6 +137,7 @@
         <input type="password" id="loginPassword" autocomplete="current-password">
       </div>
       <button class="btn btn-block" id="loginBtn">Log In</button>
+      <p style="text-align:center;margin:14px 0 0;font-size:0.85rem;"><a href="index.html">&larr; Back to main site</a></p>
       <div id="loginError">Incorrect email or password, or this account isn't authorized for admin access.</div>
     </div>
   </div>
@@ -146,7 +147,10 @@
 <div id="dashboard">
   <div class="topbar">
     <strong>Cloaked Innovations — Admin</strong>
-    <button class="btn btn-outline btn-sm" id="logoutBtn">Log Out</button>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <a class="btn btn-outline btn-sm" href="index.html" style="text-decoration:none;display:inline-block;">&larr; Back to main site</a>
+      <button class="btn btn-outline btn-sm" id="logoutBtn">Log Out</button>
+    </div>
   </div>
   <div class="layout">
     <nav class="sidebar">
@@ -266,7 +270,7 @@
       <!-- MAILBOX -->
       <section class="tab-panel" id="tab-mailbox">
         <h2>Mailbox</h2>
-        <p class="tab-sub">Emails received at info@ and support@ &mdash; requires the Resend webhook to be set up (see README).</p>
+        <p class="tab-sub">Emails received at info@ and support@.</p>
         <div class="two-col">
           <div class="conv-list" id="mailboxList"></div>
           <div class="chat-window" style="overflow-y:auto;">
@@ -286,7 +290,7 @@
       <!-- EMAIL CUSTOMER -->
       <section class="tab-panel" id="tab-email">
         <h2>Email a Customer</h2>
-        <p class="tab-sub">Sends a real email via your Resend account (requires the /api/send-email function to be deployed with RESEND_API_KEY set in Vercel).</p>
+        <p class="tab-sub">Send an email to a customer from info@ or support@.</p>
         <div class="card" style="max-width:560px;">
           <div class="field">
             <label>Send as</label>
@@ -463,28 +467,54 @@
   // ORDERS
   // ============================================================
   function loadOrders(){
-    supa.from('orders').select('*, customers(full_name, organisation)').order('created_at', {ascending:false}).then(function(res){
+    supa.from('orders').select('*, customers(id, full_name, organisation, email, phone)').order('created_at', {ascending:false}).then(function(res){
       renderOrdersTable(res.data || []);
       renderOverviewRecentOrders(res.data || []);
     });
   }
 
+  var ordersCache = [];
+
+  function extractEmail(text){
+    var m = /Email:\s*([^\s<>]+@[^\s<>]+)/i.exec(text || '');
+    return m ? m[1] : '';
+  }
+
   function renderOrdersTable(orders){
+    ordersCache = orders;
     var wrap = document.getElementById('ordersTableWrap');
     if(orders.length === 0){ wrap.innerHTML = '<div class="empty-state">No orders yet.</div>'; return; }
     var rows = orders.map(function(o){
-      var custName = o.customers ? esc(o.customers.full_name) + (o.customers.organisation ? ' — ' + esc(o.customers.organisation) : '') : '—';
+      var c = o.customers;
+      var custName = c ? '<strong>' + esc(c.full_name) + '</strong>' + (c.organisation ? '<br>' + esc(c.organisation) : '') +
+        (c.email ? '<br><span style="color:var(--muted);">' + esc(c.email) + '</span>' : '') +
+        (c.phone ? '<br><span style="color:var(--muted);">' + esc(c.phone) + '</span>' : '') : '<span style="color:var(--muted);">See message</span>';
       return '<tr><td>' + custName + '</td><td>' + esc(o.subject) + '</td><td>' + esc(o.product_needed) + '</td><td>' + esc(o.quantity) + '</td>' +
+        '<td style="min-width:220px;max-width:360px;white-space:pre-wrap;">' + esc(o.message) + '</td>' +
         '<td><select class="status-select" data-order="' + o.id + '">' +
         ['new','in_progress','quoted','won','lost'].map(function(s){ return '<option value="' + s + '"' + (s===o.status?' selected':'') + '>' + s.replace('_',' ') + '</option>'; }).join('') +
-        '</select></td><td>' + fmtDate(o.created_at) + '</td></tr>';
+        '</select></td><td>' + fmtDate(o.created_at) + '</td>' +
+        '<td><button class="btn btn-sm reply-order-btn" data-order="' + o.id + '">Reply by email</button></td></tr>';
     }).join('');
-    wrap.innerHTML = '<table><thead><tr><th>Customer</th><th>Subject</th><th>Product</th><th>Qty</th><th>Status</th><th>Received</th></tr></thead><tbody>' + rows + '</tbody></table>';
+    wrap.innerHTML = '<table><thead><tr><th>Customer</th><th>Subject</th><th>Product</th><th>Qty</th><th>Message</th><th>Status</th><th>Received</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
     wrap.querySelectorAll('.status-select').forEach(function(sel){
       sel.addEventListener('change', function(){
         supa.from('orders').update({status: sel.value, updated_at: new Date().toISOString()}).eq('id', sel.getAttribute('data-order')).then(function(){
           toast('Status updated.');
         });
+      });
+    });
+    wrap.querySelectorAll('.reply-order-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var o = ordersCache.find(function(x){ return String(x.id) === btn.getAttribute('data-order'); });
+        if(!o) return;
+        var to = (o.customers && o.customers.email) || extractEmail(o.message);
+        document.querySelector('nav.sidebar button[data-tab="email"]').click();
+        var sel = document.getElementById('emailCustomerSelect');
+        sel.value = o.customer_id || '';
+        document.getElementById('emailTo').value = to;
+        document.getElementById('emailSubject').value = 'Re: ' + (o.subject || 'Your enquiry');
+        document.getElementById('emailBody').focus();
       });
     });
   }
