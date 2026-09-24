@@ -16,7 +16,7 @@
 <meta name="twitter:description" content="Reliable non-pharmaceutical & equipment supplies for institutions, organisations and businesses across Kenya.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Abel&family=Cabin:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --navy:#2F2203;
@@ -60,11 +60,11 @@
     *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
   }
   h1,h2,h3,h4{
-    font-family:'Abel',Arial,sans-serif;
+    font-family:'Cabin',Arial,Helvetica,sans-serif;
     color:var(--navy);
     margin:0 0 0.5em 0;
-    font-weight:400;
-    letter-spacing:0.02em;
+    font-weight:700;
+    letter-spacing:0.01em;
     line-height:1.22;
   }
   h2,h3,h4{text-transform:uppercase;}
@@ -97,8 +97,8 @@
   }
   .brand-mark svg{width:19px;height:19px;}
   .brand-text{display:flex;flex-direction:column;line-height:1.15;}
-  .brand-text strong{font-family:'Abel',sans-serif;font-weight:400;letter-spacing:0.03em;text-transform:uppercase;color:#fff;font-size:1.1rem;}
-  .brand-text span{font-size:0.72rem;color:var(--plum);font-weight:600;letter-spacing:0.01em;}
+  .brand-text strong{font-family:'Cabin',sans-serif;font-weight:700;letter-spacing:0.03em;text-transform:uppercase;color:#fff;font-size:1.1rem;}
+  .brand-text span{font-size:0.72rem;color:var(--plum);font-weight:700;letter-spacing:0.01em;}
 
   nav.primary-nav{display:flex;align-items:center;gap:4px;}
   nav.primary-nav a{
@@ -188,7 +188,7 @@
   .hero{padding:64px 0 80px;}
   .hero-grid{display:grid;grid-template-columns:1.05fr 0.95fr;gap:56px;align-items:center;}
   @media (max-width:900px){ .hero-grid{grid-template-columns:1fr;gap:40px;} }
-  .hero h1{font-size:clamp(2.1rem,4vw,3.1rem);letter-spacing:-0.01em;}
+  .hero h1{font-size:clamp(2.3rem,4.6vw,3.4rem);letter-spacing:-0.01em;line-height:1.12;font-weight:700;}
   .hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px;}
   .hero-facts{display:flex;gap:28px;margin-top:40px;flex-wrap:wrap;}
   .hero-fact{border-left:2.5px solid var(--teal);padding-left:12px;}
@@ -266,10 +266,12 @@
   }
   .cat-thumb svg{width:44px;height:44px;color:var(--teal);}
   .cat-body{padding:20px 20px 22px;display:flex;flex-direction:column;gap:10px;flex:1;}
-  .cat-body h3{font-size:1.02rem;margin:0;}
-  .cat-body p{font-size:0.9rem;margin:0;flex:1;}
+  .cat-body h3{font-size:1.08rem;margin:0;color:#1F1602;}
+  .cat-body p{font-size:0.95rem;margin:0;flex:1;color:#2F2203;font-weight:500;}
+  #page-products p:not(.kicker){color:#2F2203;}
+  #page-products .lede{font-weight:500;}
   .cat-tag{
-    display:inline-block;font-size:0.72rem;font-weight:600;color:var(--accent-deep);
+    display:inline-block;font-size:0.74rem;font-weight:700;color:#8A3A00;
     background:var(--accent-tint);padding:3px 9px;border-radius:20px;width:fit-content;
     border:1px solid var(--accent);
   }
@@ -339,7 +341,7 @@
   .contact-info-item:last-child{border-bottom:none;}
   .contact-info-item .icon{width:22px;height:22px;color:var(--teal);flex-shrink:0;margin-top:2px;}
   .contact-info-item strong{display:block;color:var(--navy);font-family:'Cabin',sans-serif;font-size:0.9rem;}
-  .contact-info-item a{color:var(--muted);text-decoration:none;font-size:0.95rem;}
+  .contact-info-item a{color:var(--muted);text-decoration:none;font-size:0.95rem;overflow-wrap:anywhere;}
   .contact-info-item a:hover{color:var(--teal);}
 
   form.enquiry-form{display:grid;gap:16px;}
@@ -378,7 +380,7 @@
   .footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1.2fr;gap:36px;}
   @media (max-width:800px){ .footer-grid{grid-template-columns:1fr 1fr;} }
   @media (max-width:520px){ .footer-grid{grid-template-columns:1fr;} }
-  footer h4{color:var(--plum);font-family:'Abel',sans-serif;text-transform:uppercase;letter-spacing:0.03em;font-weight:400;font-size:1rem;margin-bottom:14px;}
+  footer h4{color:var(--plum);font-family:'Cabin',sans-serif;text-transform:uppercase;letter-spacing:0.03em;font-weight:700;font-size:1rem;margin-bottom:14px;}
   footer p{color:#B7A488;font-size:0.88rem;}
   footer ul{list-style:none;padding:0;margin:0;display:grid;gap:9px;}
   footer a{color:#CBB995;text-decoration:none;font-size:0.88rem;}
@@ -854,11 +856,11 @@
         </div>
         <div class="faq-item">
           <button class="faq-q" aria-expanded="false">How can I request a quotation?<span class="plus" aria-hidden="true"></span></button>
-          <div class="faq-a"><p>Use our contact form, call 0796 968 241, or email cloakedsolutionsltd@gmail.com with your requirements and our team will respond.</p></div>
+          <div class="faq-a"><p>Use our contact form, call 0796 968 241, or email info@cloakedinnovations.co.ke or cloakedsolutionsltd@gmail.com with your requirements and our team will respond.</p></div>
         </div>
         <div class="faq-item">
           <button class="faq-q" aria-expanded="false">Where is Cloaked Innovations Limited located?<span class="plus" aria-hidden="true"></span></button>
-          <div class="faq-a"><p>Cloaked Innovations Limited operates in Kenya. Our postal address is P.O. Box 7562-40100.</p></div>
+          <div class="faq-a"><p>Cloaked Innovations Limited operates in Kenya. Our postal address is P.O. Box 7562-40100, Kisumu, Kenya.</p></div>
         </div>
       </div>
       <div style="margin-top:20px;">
@@ -905,9 +907,9 @@
         </div>
         <div class="panel">
           <h3 style="font-size:1rem;">Company information</h3>
-          <div class="contact-info-item"><span class="icon">📍</span><div><strong>Postal address</strong><span>P.O. Box 7562-40100</span></div></div>
+          <div class="contact-info-item"><span class="icon">📍</span><div><strong>Postal address</strong><span>P.O. Box 7562-40100<br>KISUMU<br>KENYA</span></div></div>
           <div class="contact-info-item"><span class="icon">📞</span><div><strong>Telephone</strong><a href="tel:+254796968241">0796 968 241</a></div></div>
-          <div class="contact-info-item"><span class="icon">✉️</span><div><strong>Email</strong><a href="mailto:cloakedsolutionsltd@gmail.com">cloakedsolutionsltd@gmail.com</a></div></div>
+          <div class="contact-info-item"><span class="icon">✉️</span><div><strong>Email</strong><a href="mailto:info@cloakedinnovations.co.ke">info@cloakedinnovations.co.ke</a><br><a href="mailto:support@cloakedinnovations.co.ke">support@cloakedinnovations.co.ke</a><br><a href="mailto:cloakedsolutionsltd@gmail.com">cloakedsolutionsltd@gmail.com</a></div></div>
           <div class="contact-info-item"><span class="icon">🇰🇪</span><div><strong>Location</strong><span>Kenya</span></div></div>
         </div>
       </div>
@@ -1245,15 +1247,15 @@
         </div>
         <div class="faq-item">
           <button class="faq-q" aria-expanded="false">How do I request a quotation?<span class="plus" aria-hidden="true"></span></button>
-          <div class="faq-a"><p>Complete the enquiry form on our Contact page with your requirements, or reach us by phone on 0796 968 241 or email cloakedsolutionsltd@gmail.com. Our team will review your request and respond.</p></div>
+          <div class="faq-a"><p>Complete the enquiry form on our Contact page with your requirements, or reach us by phone on 0796 968 241 or email info@cloakedinnovations.co.ke or cloakedsolutionsltd@gmail.com. Our team will review your request and respond.</p></div>
         </div>
         <div class="faq-item">
           <button class="faq-q" aria-expanded="false">How do I contact Cloaked Innovations Limited?<span class="plus" aria-hidden="true"></span></button>
-          <div class="faq-a"><p>You can call 0796 968 241, email cloakedsolutionsltd@gmail.com, or use the enquiry form on our Contact page.</p></div>
+          <div class="faq-a"><p>You can call 0796 968 241, email info@cloakedinnovations.co.ke, support@cloakedinnovations.co.ke or cloakedsolutionsltd@gmail.com, or use the enquiry form on our Contact page.</p></div>
         </div>
         <div class="faq-item">
           <button class="faq-q" aria-expanded="false">What is your postal address?<span class="plus" aria-hidden="true"></span></button>
-          <div class="faq-a"><p>Our postal address is P.O. Box 7562-40100.</p></div>
+          <div class="faq-a"><p>Our postal address is P.O. Box 7562-40100, Kisumu, Kenya.</p></div>
         </div>
         <div class="faq-item">
           <button class="faq-q" aria-expanded="false">Do you deliver non-pharmaceutical & equipment supplies?<span class="plus" aria-hidden="true"></span></button>
@@ -1323,7 +1325,7 @@
           <p style="margin:0 0 16px;font-size:0.9rem;">Non-pharmaceutical & equipment supplies for institutions, organisations and businesses across Kenya.</p>
           <div class="contact-info-item">
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg>
-            <div><strong>Postal address</strong><span style="color:var(--muted);font-size:0.95rem;">P.O. Box 7562-40100</span></div>
+            <div><strong>Postal address</strong><span style="color:var(--muted);font-size:0.95rem;">P.O. Box 7562-40100<br>KISUMU<br>KENYA</span></div>
           </div>
           <div class="contact-info-item">
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.8 19.8 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.8 19.8 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.12.9.33 1.79.63 2.65a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.43-1.2a2 2 0 012.11-.45c.86.3 1.75.51 2.65.63A2 2 0 0122 16.92z"/></svg>
@@ -1331,7 +1333,7 @@
           </div>
           <div class="contact-info-item">
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
-            <div><strong>Email</strong><a href="mailto:cloakedsolutionsltd@gmail.com">cloakedsolutionsltd@gmail.com</a></div>
+            <div><strong>Email</strong><a href="mailto:info@cloakedinnovations.co.ke">info@cloakedinnovations.co.ke</a><br><a href="mailto:support@cloakedinnovations.co.ke">support@cloakedinnovations.co.ke</a><br><a href="mailto:cloakedsolutionsltd@gmail.com">cloakedsolutionsltd@gmail.com</a></div>
           </div>
         </div>
         <div class="panel" style="margin-bottom:24px;">
@@ -1348,7 +1350,7 @@
       <div class="panel">
         <h2 style="font-size:1.3rem;">Submit an enquiry</h2>
         <p style="font-size:0.92rem;margin-bottom:20px;">Complete the form and it will open in your email app, addressed to our team, ready to send.</p>
-        <div class="form-success" id="formSuccess"><strong>Your email app should now be open.</strong> Please review the pre-filled enquiry and press send. If nothing opened, email us directly at <a href="mailto:cloakedsolutionsltd@gmail.com">cloakedsolutionsltd@gmail.com</a>.</div>
+        <div class="form-success" id="formSuccess"><strong>Your email app should now be open.</strong> Please review the pre-filled enquiry and press send. If nothing opened, email us directly at <a href="mailto:info@cloakedinnovations.co.ke">info@cloakedinnovations.co.ke</a> or <a href="mailto:cloakedsolutionsltd@gmail.com">cloakedsolutionsltd@gmail.com</a>.</div>
         <form class="enquiry-form" id="enquiryForm">
           <div class="form-row">
             <div class="field">
@@ -1479,10 +1481,11 @@
     <div>
       <h4>Contact</h4>
       <ul>
-        <li>P.O. Box 7562-40100</li>
+        <li>P.O. Box 7562-40100<br>KISUMU<br>KENYA</li>
         <li><a href="tel:+254796968241">0796 968 241</a></li>
+        <li><a href="mailto:info@cloakedinnovations.co.ke">info@cloakedinnovations.co.ke</a></li>
+        <li><a href="mailto:support@cloakedinnovations.co.ke">support@cloakedinnovations.co.ke</a></li>
         <li><a href="mailto:cloakedsolutionsltd@gmail.com">cloakedsolutionsltd@gmail.com</a></li>
-        <li>Kenya</li>
       </ul>
     </div>
   </div>
@@ -1504,6 +1507,7 @@
   "address": {
     "@type": "PostalAddress",
     "postOfficeBoxNumber": "7562-40100",
+    "addressLocality": "Kisumu",
     "addressCountry": "KE"
   },
   "areaServed": {
@@ -1515,8 +1519,20 @@
   "contactPoint": [{
     "@type": "ContactPoint",
     "telephone": "+254796968241",
-    "email": "cloakedsolutionsltd@gmail.com",
+    "email": "info@cloakedinnovations.co.ke",
     "contactType": "customer service",
+    "areaServed": "KE"
+  },{
+    "@type": "ContactPoint",
+    "telephone": "+254796968241",
+    "email": "support@cloakedinnovations.co.ke",
+    "contactType": "customer support",
+    "areaServed": "KE"
+  },{
+    "@type": "ContactPoint",
+    "telephone": "+254796968241",
+    "email": "cloakedsolutionsltd@gmail.com",
+    "contactType": "sales",
     "areaServed": "KE"
   }]
 }
@@ -1591,9 +1607,9 @@
     {"@type":"Question","name":"What types of non-pharmaceutical & equipment supplies do you sell?","acceptedAnswer":{"@type":"Answer","text":"We work across categories including medical consumables, diagnostic supplies, personal protective equipment, first aid supplies, hospital and clinic supplies, and laboratory supplies. Contact us to confirm current availability for your specific requirements."}},
     {"@type":"Question","name":"Do you supply institutions and organisations?","acceptedAnswer":{"@type":"Answer","text":"Yes. We work with hospitals, clinics, healthcare institutions, schools, NGOs, and government and private institutions."}},
     {"@type":"Question","name":"Can businesses request non-pharmaceutical & equipment supplies?","acceptedAnswer":{"@type":"Answer","text":"Yes. Corporate organisations and businesses can submit enquiries for medical and health-related supplies through our contact form or by phone or email."}},
-    {"@type":"Question","name":"How do I request a quotation?","acceptedAnswer":{"@type":"Answer","text":"Complete the enquiry form on the Contact page, call 0796 968 241, or email cloakedsolutionsltd@gmail.com. Our team will review your request and respond."}},
-    {"@type":"Question","name":"How do I contact Cloaked Innovations Limited?","acceptedAnswer":{"@type":"Answer","text":"You can call 0796 968 241, email cloakedsolutionsltd@gmail.com, or use the enquiry form on the Contact page."}},
-    {"@type":"Question","name":"What is your postal address?","acceptedAnswer":{"@type":"Answer","text":"Our postal address is P.O. Box 7562-40100."}},
+    {"@type":"Question","name":"How do I request a quotation?","acceptedAnswer":{"@type":"Answer","text":"Complete the enquiry form on the Contact page, call 0796 968 241, or email info@cloakedinnovations.co.ke or cloakedsolutionsltd@gmail.com. Our team will review your request and respond."}},
+    {"@type":"Question","name":"How do I contact Cloaked Innovations Limited?","acceptedAnswer":{"@type":"Answer","text":"You can call 0796 968 241, email info@cloakedinnovations.co.ke, support@cloakedinnovations.co.ke or cloakedsolutionsltd@gmail.com, or use the enquiry form on the Contact page."}},
+    {"@type":"Question","name":"What is your postal address?","acceptedAnswer":{"@type":"Answer","text":"Our postal address is P.O. Box 7562-40100, Kisumu, Kenya."}},
     {"@type":"Question","name":"Do you deliver non-pharmaceutical & equipment supplies?","acceptedAnswer":{"@type":"Answer","text":"Delivery and supply arrangements are confirmed directly with customers as part of the quotation process. Please contact us to discuss your specific requirements."}},
     {"@type":"Question","name":"How can I enquire about a product?","acceptedAnswer":{"@type":"Answer","text":"Visit the Products page and use the Request a Quote button on the relevant category, or submit a general enquiry through the Contact page."}},
     {"@type":"Question","name":"How can I get help with a non-pharmaceutical & equipment supply requirement?","acceptedAnswer":{"@type":"Answer","text":"Reach out with details of the requirement via the contact form, phone, or email, and the Cloaked Innovations Limited team will guide you through next steps."}},
