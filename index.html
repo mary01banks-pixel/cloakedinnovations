@@ -121,7 +121,8 @@
     display:block;padding:10px 12px;font-size:0.78rem;text-transform:none;
     letter-spacing:normal;font-weight:500;color:var(--ink);
   }
-  .nav-dropdown-menu a:hover{background:var(--teal-tint);color:var(--teal-deep);}
+  nav.primary-nav .nav-dropdown-menu a{color:#1F1602;font-weight:600;font-size:0.9rem;}
+  nav.primary-nav .nav-dropdown-menu a:hover{background:var(--teal-tint);color:#8A3A00;}
   @media (min-width:901px){
     .nav-dropdown:hover .nav-dropdown-menu, .nav-dropdown:focus-within .nav-dropdown-menu{display:block;}
     .nav-dropdown:hover .caret{transform:rotate(180deg);}
@@ -276,11 +277,6 @@
     border:1px solid var(--accent);
   }
 
-  .catalogue-note{
-    background:var(--teal-tint);border:1px solid var(--teal);border-radius:var(--radius-m);
-    padding:16px 20px;font-size:0.92rem;color:var(--navy);margin-bottom:32px;
-  }
-  .catalogue-note strong{color:var(--teal-deep);}
 
   /* ---------- Steps ---------- */
   .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;position:relative;}
@@ -360,6 +356,9 @@
     padding:16px 18px;color:var(--navy);font-size:0.92rem;
   }
   .form-success.show{display:block;}
+  .form-error{display:none;background:#FDECEC;border:1px solid #C0392B;border-radius:var(--radius-m);padding:16px 18px;color:#7A1F14;font-size:0.92rem;}
+  .form-error.show{display:block;}
+  .form-error a{color:#7A1F14;}
   .form-success strong{color:var(--green);}
 
   /* ---------- Final CTA banner ---------- */
@@ -1005,9 +1004,6 @@
 
   <section class="tight">
     <div class="container">
-      <div class="catalogue-note">
-        <strong>Sample catalogue framework:</strong> the categories and items below illustrate how our catalogue is organised. They are placeholders pending confirmation of our verified product range, and should not be treated as confirmed stock, pricing or specifications. Please contact us to confirm exact availability.
-      </div>
 
       <h3 style="font-size:1.15rem;margin-top:8px;">What non-pharmaceutical & equipment supplies does Cloaked Innovations Limited offer?</h3>
       <p style="max-width:70ch;">Cloaked Innovations Limited works across six categories: medical consumables, diagnostic supplies, personal protective equipment (PPE), first aid supplies, hospital and clinic supplies, and laboratory supplies. Availability within each category is confirmed directly with our team at enquiry stage.</p>
@@ -1350,7 +1346,8 @@
       <div class="panel">
         <h2 style="font-size:1.3rem;">Submit an enquiry</h2>
         <p style="font-size:0.92rem;margin-bottom:20px;">Complete the form and it will open in your email app, addressed to our team, ready to send.</p>
-        <div class="form-success" id="formSuccess"><strong>Your email app should now be open.</strong> Please review the pre-filled enquiry and press send. If nothing opened, email us directly at <a href="mailto:info@cloakedinnovations.co.ke">info@cloakedinnovations.co.ke</a> or <a href="mailto:cloakedsolutionsltd@gmail.com">cloakedsolutionsltd@gmail.com</a>.</div>
+        <div class="form-success" id="formSuccess" role="status"><strong>Thank you &mdash; your enquiry has been received.</strong> Our team will review your requirements and get back to you by email or phone as soon as possible.</div>
+        <div class="form-error" id="formError" role="alert"><strong>Sorry, we couldn't send your enquiry.</strong> Please try again in a moment, or contact us directly at <a href="mailto:info@cloakedinnovations.co.ke">info@cloakedinnovations.co.ke</a> or call <a href="tel:+254796968241">0796 968 241</a>.</div>
         <form class="enquiry-form" id="enquiryForm">
           <div class="form-row">
             <div class="field">
@@ -1394,7 +1391,7 @@
             <textarea id="message" name="message" required placeholder="Tell us more about what your organisation needs"></textarea>
           </div>
           <button type="submit" class="btn btn-primary btn-block">Submit enquiry</button>
-          <p class="field-hint">By submitting, your enquiry will be prepared as an email to cloakedsolutionsltd@gmail.com. We'll respond as soon as possible.</p>
+          <p class="field-hint">By submitting, your enquiry is sent securely to our team. We'll respond as soon as possible.</p>
         </form>
       </div>
     </div>
@@ -1771,12 +1768,14 @@
     });
   });
 
-  // Contact form -> mailto
+  // Contact form -> saved to the admin panel (no email client is opened)
   var form = document.getElementById('enquiryForm');
   var successBox = document.getElementById('formSuccess');
+  var errorBox = document.getElementById('formError');
   if(form){
     form.addEventListener('submit', function(e){
       e.preventDefault();
+      var submitBtn = form.querySelector('button[type="submit"]');
       var name = document.getElementById('fullName').value.trim();
       var org = document.getElementById('orgName').value.trim();
       var email = document.getElementById('email').value.trim();
@@ -1786,41 +1785,53 @@
       var qty = document.getElementById('quantity').value.trim();
       var message = document.getElementById('message').value.trim();
 
-      var subject = subjectField + ' \u2014 ' + (org || name || 'website visitor');
-      var bodyLines = [
-        'Subject: ' + subjectField,
+      // Contact details are also stored with the enquiry itself, so the admin
+      // always sees who sent it and how to reply.
+      var fullMessage = [
         'Name: ' + name,
         'Organisation: ' + (org || '-'),
         'Email: ' + email,
         'Phone: ' + (phone || '-'),
-        'Product or service required: ' + (product || '-'),
-        'Quantity / requirements: ' + (qty || '-'),
         '',
-        'Message:',
         message
-      ];
-      var body = bodyLines.join('\n');
-      var mailto = 'mailto:cloakedsolutionsltd@gmail.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-      window.location.href = mailto;
-      successBox.classList.add('show');
-      successBox.scrollIntoView({behavior:'smooth', block:'center'});
+      ].join('\n');
 
-      // Save to Supabase so it shows up in the admin panel (Customers/Orders)
-      if(supa){
-        supa.from('customers').insert({
-          full_name: name, organisation: org, email: email, phone: phone
-        }).select().then(function(res){
-          var customerId = (res.data && res.data[0]) ? res.data[0].id : null;
-          supa.from('orders').insert({
-            customer_id: customerId,
-            subject: subjectField,
-            product_needed: product,
-            quantity: qty,
-            message: message,
-            status: 'new'
-          }).then(function(){}, function(){});
-        }, function(){});
+      successBox.classList.remove('show');
+      errorBox.classList.remove('show');
+      if(!supa){ errorBox.classList.add('show'); return; }
+
+      var originalLabel = submitBtn ? submitBtn.textContent : '';
+      if(submitBtn){ submitBtn.disabled = true; submitBtn.textContent = 'Sending\u2026'; }
+
+      function saveCustomer(){
+        var row = { full_name: name, organisation: org, email: email, phone: phone };
+        return supa.from('customers').insert(row).select().then(function(res){
+          if(!res.error && res.data && res.data[0]) return res.data[0].id;
+          // Retry without reading the row back (some setups don't allow it)
+          return supa.from('customers').insert(row).then(function(){ return null; });
+        });
       }
+
+      saveCustomer().catch(function(){ return null; }).then(function(customerId){
+        return supa.from('orders').insert({
+          customer_id: customerId,
+          subject: subjectField,
+          product_needed: product,
+          quantity: qty,
+          message: fullMessage,
+          status: 'new'
+        });
+      }).then(function(res){
+        if(res.error) throw res.error;
+        form.reset();
+        successBox.classList.add('show');
+        successBox.scrollIntoView({behavior:'smooth', block:'center'});
+      }).catch(function(){
+        errorBox.classList.add('show');
+        errorBox.scrollIntoView({behavior:'smooth', block:'center'});
+      }).then(function(){
+        if(submitBtn){ submitBtn.disabled = false; submitBtn.textContent = originalLabel; }
+      });
     });
   }
 
