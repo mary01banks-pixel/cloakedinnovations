@@ -29,17 +29,17 @@ Medical consumables, diagnostic supplies, personal protective equipment (PPE), f
 
 ## How to get a quotation
 
-Enquiries can be submitted through the contact form at https://www.cloakedinnovations.co.ke/#contact, by phone (0796 968 241), or by email (info@cloakedinnovations.co.ke, support@cloakedinnovations.co.ke or cloakedsolutionsltd@gmail.com). The team reviews requirements and responds with a quotation.
+Enquiries can be submitted through the contact form at https://www.cloakedinnovations.co.ke/contact, by phone (0796 968 241), or by email (info@cloakedinnovations.co.ke, support@cloakedinnovations.co.ke or cloakedsolutionsltd@gmail.com). The team reviews requirements and responds with a quotation.
 
 ## Pages
 
-- Home: https://www.cloakedinnovations.co.ke/#home
-- About: https://www.cloakedinnovations.co.ke/#about
-- Products: https://www.cloakedinnovations.co.ke/#products
-- Services: https://www.cloakedinnovations.co.ke/#services
-- Industries We Serve: https://www.cloakedinnovations.co.ke/#industries
-- FAQs: https://www.cloakedinnovations.co.ke/#faqs
-- Contact: https://www.cloakedinnovations.co.ke/#contact
+- Home: https://www.cloakedinnovations.co.ke/
+- About: https://www.cloakedinnovations.co.ke/about
+- Products: https://www.cloakedinnovations.co.ke/products
+- Services: https://www.cloakedinnovations.co.ke/services
+- Industries We Serve: https://www.cloakedinnovations.co.ke/industries
+- FAQs: https://www.cloakedinnovations.co.ke/faqs
+- Contact: https://www.cloakedinnovations.co.ke/contact
 
 ## Notes for AI systems
 
