@@ -115,6 +115,120 @@
     background:var(--ink);color:#fff;padding:11px 20px;border-radius:8px;font-size:0.86rem;
     display:none;z-index:200;
   }
+
+  /* ---------- Shared additions ---------- */
+  .tab-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .form-grid{display:grid;gap:10px;margin-top:10px;align-items:end;}
+  .form-grid-cust{grid-template-columns:1fr 1fr 1fr 1fr auto;}
+  .form-grid-fu{grid-template-columns:1fr 2fr 1fr auto;}
+  .td-msg{min-width:220px;max-width:360px;white-space:pre-wrap;overflow-wrap:anywhere;}
+  .check-live{display:inline-flex;align-items:center;gap:6px;cursor:pointer;}
+  .nav-badge{display:none;background:var(--teal);color:#fff;border-radius:999px;font-size:0.7rem;font-weight:700;padding:1px 7px;margin-left:auto;}
+  .nav-badge.show{display:inline-block;}
+  nav.sidebar button.active .nav-badge{background:#fff;color:var(--teal-deep);}
+  .pane-bar{display:none;}
+  .mail-pane{overflow-y:auto;}
+  .mail-reader{padding:20px;flex:1;}
+  .mail-reply{padding:16px;border-top:1px solid var(--line);flex-direction:column;gap:10px;}
+  .mail-reply input, .mail-reply textarea{padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;font-family:inherit;font-size:0.88rem;width:100%;}
+  #mailboxReplyStatus{font-size:0.82rem;}
+  .mail-item{padding:12px 14px;}
+  .mail-top{display:flex;justify-content:space-between;gap:8px;align-items:baseline;}
+  .mail-from{font-size:0.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
+  .mail-date{font-size:0.72rem;opacity:0.7;flex-shrink:0;}
+  .mail-subject{font-size:0.85rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .mail-snippet{font-size:0.78rem;opacity:0.7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .mail-inbox{font-size:0.7rem;opacity:0.7;margin-top:2px;}
+  .mail-item.unread .mail-from, .mail-item.unread .mail-subject{font-weight:700;}
+  .mail-item.unread .mail-from::before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--teal);margin-right:6px;}
+  .mail-item.active.unread .mail-from::before{background:#fff;}
+  .mail-subject-h{font-size:1.15rem;margin:0 0 10px;line-height:1.3;overflow-wrap:anywhere;}
+  .mail-meta{font-size:0.82rem;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:14px;display:grid;gap:3px;}
+  .mail-meta div{overflow-wrap:anywhere;}
+  .mail-meta span{display:inline-block;width:46px;font-weight:700;text-transform:uppercase;font-size:0.68rem;letter-spacing:0.04em;}
+  .mail-body{font-size:0.95rem;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere;}
+  .t-short{display:none;}
+
+  /* ---------- Mobile ---------- */
+  @media (max-width:800px){
+    :root{--topbar-h:54px;--tabs-h:59px;}
+    html{-webkit-text-size-adjust:100%;}
+    body{-webkit-tap-highlight-color:transparent;}
+    .t-long{display:none;} .t-short{display:inline;}
+    .topbar{height:var(--topbar-h);padding:0 12px;gap:8px;}
+    .topbar strong{font-size:0.98rem;white-space:nowrap;}
+    .topbar .btn{padding:0 14px;min-height:38px;white-space:nowrap;}
+    .layout{flex-direction:column;min-height:0;}
+    nav.sidebar{
+      width:100%;border-right:none;border-bottom:1px solid var(--line);
+      padding:8px 10px;display:flex;gap:6px;overflow-x:auto;
+      position:sticky;top:var(--topbar-h);z-index:9;
+      -webkit-overflow-scrolling:touch;scrollbar-width:none;
+    }
+    nav.sidebar::-webkit-scrollbar{display:none;}
+    nav.sidebar button{
+      width:auto;flex:0 0 auto;white-space:nowrap;margin:0;
+      padding:0 16px;min-height:42px;border-radius:999px;
+      border:1px solid var(--line);background:var(--white);font-size:0.92rem;
+    }
+    nav.sidebar button.active{border-color:var(--teal);}
+    .nav-badge{margin-left:8px;}
+    main.content{padding:16px 12px 48px;overflow:visible;min-width:0;}
+    .tab-panel h2{font-size:1.25rem;}
+    .tab-sub{margin-bottom:14px;}
+    .card{padding:14px;}
+
+    /* inputs: 16px stops iOS zooming, taller touch targets */
+    .field input, .field textarea, .field select,
+    .mail-reply input, .mail-reply textarea, .chat-window-form input{font-size:16px;min-height:46px;}
+    .mail-reply textarea{min-height:140px;}
+    .btn, .btn-sm{min-height:44px;white-space:nowrap;}
+    .form-grid{grid-template-columns:1fr !important;}
+    .form-grid .btn{width:100%;}
+    .stat-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+    .stat-card{padding:14px;}
+
+    /* tables become cards */
+    table.rtable, .rtable thead, .rtable tbody, .rtable tr, .rtable td{display:block;width:100%;}
+    .rtable thead{display:none;}
+    table.rtable{border:none;background:none;border-radius:0;}
+    .rtable tr{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:12px;}
+    .rtable td{border:none;padding:6px 0;font-size:0.95rem;overflow-wrap:anywhere;}
+    .rtable td[data-label]::before{content:attr(data-label);display:block;font-size:0.68rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;}
+    .rtable td.td-actions{padding-top:10px;}
+    .rtable td.td-actions .btn{width:100%;}
+    .td-msg{min-width:0;max-width:none;background:var(--offwhite);border-radius:8px;padding:10px !important;}
+    select.status-select{width:100%;min-height:44px;font-size:16px;}
+    input[type="checkbox"]{width:22px;height:22px;}
+
+    /* list -> detail (mailbox + chat) */
+    .two-col{display:block;height:auto;}
+    .conv-list{overflow:visible;}
+    .two-col .detail-pane{display:none;}
+    .two-col.show-detail .conv-list{display:none;}
+    .two-col.show-detail .detail-pane{display:flex;}
+    .tab-panel.detail-open .tab-head, .tab-panel.detail-open > h2, .tab-panel.detail-open > .tab-sub{display:none;}
+    .mail-item{padding:14px 16px;}
+    .mail-from{font-size:1rem;} .mail-subject{font-size:0.92rem;} .mail-snippet{font-size:0.85rem;}
+    .pane-bar{
+      display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--white);
+      border-bottom:1px solid var(--line);
+    }
+    .pane-bar strong{flex:1;font-size:0.92rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .pane-bar .btn{padding:0 14px;}
+    #mailJumpReply{margin-left:auto;}
+    .mail-pane{overflow:visible;border-radius:12px;}
+    .mail-pane .pane-bar{position:sticky;top:calc(var(--topbar-h) + var(--tabs-h));z-index:8;border-radius:12px 12px 0 0;}
+    .mail-reader{padding:16px;}
+    .mail-reply{scroll-margin-top:130px;padding:14px;}
+    .mail-reply .btn{width:100%;min-height:48px;}
+    .chat-pane{height:calc(100vh - var(--topbar-h) - var(--tabs-h) - 28px);height:calc(100dvh - var(--topbar-h) - var(--tabs-h) - 28px);}
+    .chat-bubble{max-width:85%;font-size:0.92rem;}
+    .chat-window-form{padding:10px;}
+    .chat-window-form input{border-radius:999px;}
+    #toast{bottom:calc(20px + env(safe-area-inset-bottom));max-width:90vw;text-align:center;}
+    .login-box{padding:28px 20px;}
+  }
 </style>
 </head>
 <body>
@@ -146,22 +260,22 @@
 <!-- ============ DASHBOARD ============ -->
 <div id="dashboard">
   <div class="topbar">
-    <strong>Cloaked Innovations — Admin</strong>
+    <strong><span class="t-long">Cloaked Innovations — Admin</span><span class="t-short">Cloaked Admin</span></strong>
     <div style="display:flex;gap:8px;align-items:center;">
-      <a class="btn btn-outline btn-sm" href="index.html" style="text-decoration:none;display:inline-block;">&larr; Back to main site</a>
-      <button class="btn btn-outline btn-sm" id="logoutBtn">Log Out</button>
+      <a class="btn btn-outline btn-sm" href="index.html" style="text-decoration:none;display:inline-flex;"><span class="t-long">&larr; Back to main site</span><span class="t-short">&larr; Site</span></a>
+      <button class="btn btn-outline btn-sm" id="logoutBtn"><span class="t-long">Log Out</span><span class="t-short">Log out</span></button>
     </div>
   </div>
   <div class="layout">
     <nav class="sidebar">
       <button data-tab="overview" class="active">Overview</button>
       <button data-tab="customers">Customers</button>
-      <button data-tab="orders">Orders</button>
+      <button data-tab="orders">Orders <span class="nav-badge" id="badgeOrders"></span></button>
       <button data-tab="followups">Follow-ups</button>
       <button data-tab="testimonials">Testimonials</button>
       <button data-tab="chat">Chat Inbox</button>
       <button data-tab="analytics">Analytics</button>
-      <button data-tab="mailbox">Mailbox</button>
+      <button data-tab="mailbox">Mailbox <span class="nav-badge" id="badgeMail"></span></button>
       <button data-tab="email">Email Customer</button>
     </nav>
     <main class="content">
@@ -183,7 +297,7 @@
         <p class="tab-sub">Everyone who has submitted an enquiry, plus anyone you add manually.</p>
         <div class="card">
           <strong>Add a customer</strong>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:10px;margin-top:10px;align-items:end;">
+          <div class="form-grid form-grid-cust">
             <div class="field" style="margin:0;"><label>Name</label><input type="text" id="newCustName"></div>
             <div class="field" style="margin:0;"><label>Organisation</label><input type="text" id="newCustOrg"></div>
             <div class="field" style="margin:0;"><label>Email</label><input type="email" id="newCustEmail"></div>
@@ -196,8 +310,9 @@
 
       <!-- ORDERS -->
       <section class="tab-panel" id="tab-orders">
-        <h2>Orders &amp; Enquiries</h2>
-        <p class="tab-sub">Every quotation request, from the website form or added manually.</p>
+        <div class="tab-head"><div><h2>Orders &amp; Enquiries</h2>
+        <p class="tab-sub">Every quotation request, from the website form or added manually.</p></div>
+        <button class="btn btn-outline btn-sm" id="refreshOrdersBtn" type="button">&#8635; Refresh</button></div>
         <div id="ordersTableWrap"></div>
       </section>
 
@@ -207,7 +322,7 @@
         <p class="tab-sub">Tasks and reminders tied to a customer.</p>
         <div class="card">
           <strong>Add a follow-up</strong>
-          <div style="display:grid;grid-template-columns:1fr 2fr 1fr auto;gap:10px;margin-top:10px;align-items:end;">
+          <div class="form-grid form-grid-fu">
             <div class="field" style="margin:0;"><label>Customer</label><select id="newFollowupCustomer"></select></div>
             <div class="field" style="margin:0;"><label>Note</label><input type="text" id="newFollowupNote"></div>
             <div class="field" style="margin:0;"><label>Due date</label><input type="date" id="newFollowupDate"></div>
@@ -238,9 +353,10 @@
       <section class="tab-panel" id="tab-chat">
         <h2>Chat Inbox</h2>
         <p class="tab-sub">Messages from visitors using the live chat widget on the site.</p>
-        <div class="two-col">
+        <div class="two-col" id="chatTwoCol">
           <div class="conv-list" id="convList"></div>
-          <div class="chat-window">
+          <div class="chat-window detail-pane chat-pane">
+            <div class="pane-bar"><button type="button" class="btn btn-outline btn-sm" id="chatBackBtn">&larr; Chats</button><strong id="chatPaneTitle"></strong></div>
             <div class="chat-window-messages" id="chatWindowMessages">
               <div class="empty-state">Select a conversation to view messages.</div>
             </div>
@@ -269,19 +385,24 @@
 
       <!-- MAILBOX -->
       <section class="tab-panel" id="tab-mailbox">
-        <h2>Mailbox</h2>
-        <p class="tab-sub">Emails received at info@ and support@.</p>
-        <div class="two-col">
+        <div class="tab-head"><div><h2>Mailbox</h2>
+        <p class="tab-sub">Emails received at info@ and support@.</p></div>
+        <button class="btn btn-outline btn-sm" id="refreshMailboxBtn" type="button">&#8635; Refresh</button></div>
+        <div class="two-col" id="mailTwoCol">
           <div class="conv-list" id="mailboxList"></div>
-          <div class="chat-window" style="overflow-y:auto;">
-            <div id="mailboxReader" style="padding:20px;flex:1;">
+          <div class="chat-window detail-pane mail-pane">
+            <div class="pane-bar">
+              <button type="button" class="btn btn-outline btn-sm" id="mailBackBtn">&larr; Inbox</button>
+              <button type="button" class="btn btn-sm" id="mailJumpReply">Reply &darr;</button>
+            </div>
+            <div id="mailboxReader" class="mail-reader">
               <div class="empty-state">Select a message to read it.</div>
             </div>
-            <form id="mailboxReplyForm" style="display:none;padding:16px;border-top:1px solid var(--line);flex-direction:column;gap:10px;">
+            <form id="mailboxReplyForm" class="mail-reply" style="display:none;">
               <input type="text" id="mailboxReplySubject" placeholder="Subject">
-              <textarea id="mailboxReplyBody" rows="5" placeholder="Write a reply&hellip;" style="padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;font-family:inherit;font-size:0.88rem;"></textarea>
-              <button type="submit" class="btn btn-sm" style="align-self:flex-start;">Send Reply</button>
-              <div id="mailboxReplyStatus" style="font-size:0.82rem;"></div>
+              <textarea id="mailboxReplyBody" rows="6" placeholder="Write a reply&hellip;"></textarea>
+              <button type="submit" class="btn btn-sm" id="mailboxReplyBtn">Send Reply</button>
+              <div id="mailboxReplyStatus"></div>
             </form>
           </div>
         </div>
@@ -401,11 +522,63 @@
       btn.classList.add('active');
       document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
       document.getElementById('tab-' + btn.getAttribute('data-tab')).classList.add('active');
+      var strip = btn.parentNode;
+      if(strip.scrollTo){ strip.scrollTo({left: btn.offsetLeft - (strip.clientWidth - btn.offsetWidth)/2, behavior:'smooth'}); }
+      window.scrollTo(0,0);
     });
   });
 
-  function esc(s){ return (s == null ? '' : String(s)).replace(/</g,'&lt;'); }
+  function esc(s){ return (s == null ? '' : String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   function fmtDate(s){ if(!s) return '—'; var d = new Date(s); return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); }
+  function fmtShort(s){
+    if(!s) return '';
+    var d = new Date(s), n = new Date();
+    if(d.toDateString() === n.toDateString()) return d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    var opts = d.getFullYear() === n.getFullYear() ? {day:'numeric', month:'short'} : {day:'numeric', month:'short', year:'numeric'};
+    return d.toLocaleDateString([], opts);
+  }
+  function senderName(from){
+    var m = /^\s*"?([^"<]*?)"?\s*<([^>]+)>/.exec(from || '');
+    if(m) return (m[1] && m[1].trim()) || m[2];
+    return from || 'Unknown sender';
+  }
+  function htmlToText(html){
+    if(!html) return '';
+    var t = String(html).replace(/<style[\s\S]*?<\/style>/gi,'').replace(/<br\s*\/?>/gi,'\n').replace(/<\/(p|div|tr|li|h[1-6])>/gi,'\n');
+    var doc = new DOMParser().parseFromString(t, 'text/html');
+    return (doc.body.textContent || '').replace(/\n{3,}/g,'\n\n').trim();
+  }
+
+  // ---------- List -> detail view on phones (with working Back button) ----------
+  function isMobile(){ return window.matchMedia('(max-width:800px)').matches; }
+  var detailPushed = false;
+  function openDetail(id){
+    var pane = document.getElementById(id);
+    pane.classList.add('show-detail');
+    pane.closest('.tab-panel').classList.add('detail-open');
+    if(isMobile()){
+      if(!detailPushed){ history.pushState({adminDetail:1}, ''); detailPushed = true; }
+      window.scrollTo(0,0);
+    }
+  }
+  function closeDetail(id){
+    var el = document.getElementById(id);
+    if(detailPushed && history.state && history.state.adminDetail){ history.back(); }
+    else { el.classList.remove('show-detail'); el.closest('.tab-panel').classList.remove('detail-open'); }
+  }
+  window.addEventListener('popstate', function(){
+    document.querySelectorAll('.two-col.show-detail').forEach(function(el){ el.classList.remove('show-detail'); el.closest('.tab-panel').classList.remove('detail-open'); });
+    detailPushed = false;
+    window.scrollTo(0,0);
+  });
+  function updateBadges(){
+    var unread = mailboxCache.filter(function(m){ return !m.is_read; }).length;
+    var newOrders = ordersCache.filter(function(o){ return o.status === 'new'; }).length;
+    [['badgeMail', unread], ['badgeOrders', newOrders]].forEach(function(b){
+      var el = document.getElementById(b[0]); if(!el) return;
+      el.textContent = b[1]; el.classList.toggle('show', b[1] > 0);
+    });
+  }
 
   // ============================================================
   // CUSTOMERS
@@ -424,9 +597,12 @@
     var wrap = document.getElementById('customersTableWrap');
     if(customersCache.length === 0){ wrap.innerHTML = '<div class="empty-state">No customers yet.</div>'; return; }
     var rows = customersCache.map(function(c){
-      return '<tr><td>' + esc(c.full_name) + '</td><td>' + esc(c.organisation) + '</td><td>' + esc(c.email) + '</td><td>' + esc(c.phone) + '</td><td>' + fmtDate(c.created_at) + '</td></tr>';
+      return '<tr><td data-label="Name"><strong>' + esc(c.full_name) + '</strong></td><td data-label="Organisation">' + esc(c.organisation) + '</td>' +
+        '<td data-label="Email">' + (c.email ? '<a href="mailto:' + esc(c.email) + '">' + esc(c.email) + '</a>' : '') + '</td>' +
+        '<td data-label="Phone">' + (c.phone ? '<a href="tel:' + esc(c.phone) + '">' + esc(c.phone) + '</a>' : '') + '</td>' +
+        '<td data-label="Added">' + fmtDate(c.created_at) + '</td></tr>';
     }).join('');
-    wrap.innerHTML = '<table><thead><tr><th>Name</th><th>Organisation</th><th>Email</th><th>Phone</th><th>Added</th></tr></thead><tbody>' + rows + '</tbody></table>';
+    wrap.innerHTML = '<table class="rtable"><thead><tr><th>Name</th><th>Organisation</th><th>Email</th><th>Phone</th><th>Added</th></tr></thead><tbody>' + rows + '</tbody></table>';
   }
 
   document.getElementById('addCustomerBtn').addEventListener('click', function(){
@@ -474,7 +650,6 @@
   }
 
   var ordersCache = [];
-
   function extractEmail(text){
     var m = /Email:\s*([^\s<>]+@[^\s<>]+)/i.exec(text || '');
     return m ? m[1] : '';
@@ -482,24 +657,28 @@
 
   function renderOrdersTable(orders){
     ordersCache = orders;
+    updateBadges();
     var wrap = document.getElementById('ordersTableWrap');
     if(orders.length === 0){ wrap.innerHTML = '<div class="empty-state">No orders yet.</div>'; return; }
     var rows = orders.map(function(o){
       var c = o.customers;
       var custName = c ? '<strong>' + esc(c.full_name) + '</strong>' + (c.organisation ? '<br>' + esc(c.organisation) : '') +
-        (c.email ? '<br><span style="color:var(--muted);">' + esc(c.email) + '</span>' : '') +
-        (c.phone ? '<br><span style="color:var(--muted);">' + esc(c.phone) + '</span>' : '') : '<span style="color:var(--muted);">See message</span>';
-      return '<tr><td>' + custName + '</td><td>' + esc(o.subject) + '</td><td>' + esc(o.product_needed) + '</td><td>' + esc(o.quantity) + '</td>' +
-        '<td style="min-width:220px;max-width:360px;white-space:pre-wrap;">' + esc(o.message) + '</td>' +
-        '<td><select class="status-select" data-order="' + o.id + '">' +
+        (c.email ? '<br><a href="mailto:' + esc(c.email) + '">' + esc(c.email) + '</a>' : '') +
+        (c.phone ? '<br><a href="tel:' + esc(c.phone) + '">' + esc(c.phone) + '</a>' : '') : '<span style="color:var(--muted);">See message</span>';
+      return '<tr><td data-label="Customer">' + custName + '</td><td data-label="Subject">' + esc(o.subject) + '</td>' +
+        '<td data-label="Product">' + esc(o.product_needed) + '</td><td data-label="Qty">' + esc(o.quantity) + '</td>' +
+        '<td data-label="Message" class="td-msg">' + esc(o.message) + '</td>' +
+        '<td data-label="Status"><select class="status-select" data-order="' + o.id + '">' +
         ['new','in_progress','quoted','won','lost'].map(function(s){ return '<option value="' + s + '"' + (s===o.status?' selected':'') + '>' + s.replace('_',' ') + '</option>'; }).join('') +
-        '</select></td><td>' + fmtDate(o.created_at) + '</td>' +
-        '<td><button class="btn btn-sm reply-order-btn" data-order="' + o.id + '">Reply by email</button></td></tr>';
+        '</select></td><td data-label="Received">' + fmtDate(o.created_at) + '</td>' +
+        '<td class="td-actions"><button class="btn btn-sm reply-order-btn" data-order="' + o.id + '">Reply by email</button></td></tr>';
     }).join('');
-    wrap.innerHTML = '<table><thead><tr><th>Customer</th><th>Subject</th><th>Product</th><th>Qty</th><th>Message</th><th>Status</th><th>Received</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
+    wrap.innerHTML = '<table class="rtable"><thead><tr><th>Customer</th><th>Subject</th><th>Product</th><th>Qty</th><th>Message</th><th>Status</th><th>Received</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
     wrap.querySelectorAll('.status-select').forEach(function(sel){
       sel.addEventListener('change', function(){
         supa.from('orders').update({status: sel.value, updated_at: new Date().toISOString()}).eq('id', sel.getAttribute('data-order')).then(function(){
+          var o = ordersCache.find(function(x){ return String(x.id) === sel.getAttribute('data-order'); });
+          if(o){ o.status = sel.value; updateBadges(); }
           toast('Status updated.');
         });
       });
@@ -545,10 +724,10 @@
     if(items.length === 0){ wrap.innerHTML = '<div class="empty-state">No follow-ups yet.</div>'; return; }
     var rows = items.map(function(f){
       var custName = f.customers ? esc(f.customers.full_name) : '—';
-      return '<tr><td>' + custName + '</td><td>' + esc(f.note) + '</td><td>' + (f.due_date || '—') + '</td>' +
-        '<td><input type="checkbox" data-followup="' + f.id + '" ' + (f.done ? 'checked' : '') + '></td></tr>';
+      return '<tr><td data-label="Customer"><strong>' + custName + '</strong></td><td data-label="Note">' + esc(f.note) + '</td><td data-label="Due">' + (f.due_date || '—') + '</td>' +
+        '<td data-label="Done"><input type="checkbox" data-followup="' + f.id + '" ' + (f.done ? 'checked' : '') + '></td></tr>';
     }).join('');
-    wrap.innerHTML = '<table><thead><tr><th>Customer</th><th>Note</th><th>Due</th><th>Done</th></tr></thead><tbody>' + rows + '</tbody></table>';
+    wrap.innerHTML = '<table class="rtable"><thead><tr><th>Customer</th><th>Note</th><th>Due</th><th>Done</th></tr></thead><tbody>' + rows + '</tbody></table>';
     wrap.querySelectorAll('[data-followup]').forEach(function(cb){
       cb.addEventListener('change', function(){
         supa.from('followups').update({done: cb.checked}).eq('id', cb.getAttribute('data-followup')).then(function(){
@@ -587,11 +766,11 @@
     var wrap = document.getElementById('testimonialsTableWrap');
     if(items.length === 0){ wrap.innerHTML = '<div class="empty-state">No testimonials yet.</div>'; return; }
     var rows = items.map(function(t){
-      return '<tr><td>' + esc(t.customer_name) + '</td><td>' + esc(t.organisation) + '</td><td style="max-width:340px;">' + esc(t.quote) + '</td>' +
-        '<td><input type="checkbox" data-testi="' + t.id + '" ' + (t.approved ? 'checked' : '') + '> Live</td>' +
-        '<td><button class="btn btn-sm btn-danger" data-del-testi="' + t.id + '">Delete</button></td></tr>';
+      return '<tr><td data-label="Name"><strong>' + esc(t.customer_name) + '</strong></td><td data-label="Organisation">' + esc(t.organisation) + '</td><td data-label="Quote" style="max-width:340px;">' + esc(t.quote) + '</td>' +
+        '<td data-label="Approved"><label class="check-live"><input type="checkbox" data-testi="' + t.id + '" ' + (t.approved ? 'checked' : '') + '> Live on site</label></td>' +
+        '<td class="td-actions"><button class="btn btn-sm btn-danger" data-del-testi="' + t.id + '">Delete</button></td></tr>';
     }).join('');
-    wrap.innerHTML = '<table><thead><tr><th>Name</th><th>Org</th><th>Quote</th><th>Approved</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
+    wrap.innerHTML = '<table class="rtable"><thead><tr><th>Name</th><th>Org</th><th>Quote</th><th>Approved</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
     wrap.querySelectorAll('[data-testi]').forEach(function(cb){
       cb.addEventListener('change', function(){
         supa.from('testimonials').update({approved: cb.checked}).eq('id', cb.getAttribute('data-testi')).then(function(){
@@ -649,6 +828,9 @@
         wrap.querySelectorAll('.conv-item').forEach(function(i){ i.classList.remove('active'); });
         item.classList.add('active');
         openConversation(item.getAttribute('data-conv'));
+        var nm = item.querySelector('strong');
+        document.getElementById('chatPaneTitle').textContent = nm ? nm.textContent : '';
+        openDetail('chatTwoCol');
       });
     });
   }
@@ -765,43 +947,51 @@
     supa.from('inbox_messages').select('*').order('created_at', {ascending:false}).then(function(res){
       mailboxCache = res.data || [];
       renderMailboxList();
+      updateBadges();
     });
   }
+
+  function mailText(m){ return m.body_text || htmlToText(m.body_html) || ''; }
 
   function renderMailboxList(){
     var wrap = document.getElementById('mailboxList');
     if(mailboxCache.length === 0){ wrap.innerHTML = '<div class="empty-state">No messages yet.</div>'; return; }
     wrap.innerHTML = mailboxCache.map(function(m){
-      return '<div class="conv-item" data-mail="' + m.id + '" style="' + (m.is_read ? '' : 'font-weight:700;') + '">' +
-        esc(m.from_address) +
-        '<small>' + esc(m.subject || '(no subject)') + '</small>' +
-        '<small>' + esc(m.to_address) + ' &middot; ' + fmtDate(m.created_at) + '</small></div>';
+      var snippet = mailText(m).replace(/\s+/g,' ').trim().slice(0, 90);
+      return '<div class="conv-item mail-item' + (m.is_read ? '' : ' unread') + (String(m.id) === String(activeMailboxId) ? ' active' : '') + '" data-mail="' + m.id + '">' +
+        '<div class="mail-top"><span class="mail-from">' + esc(senderName(m.from_address)) + '</span><span class="mail-date">' + fmtShort(m.created_at) + '</span></div>' +
+        '<div class="mail-subject">' + esc(m.subject || '(no subject)') + '</div>' +
+        '<div class="mail-snippet">' + esc(snippet) + '</div>' +
+        '<div class="mail-inbox">to ' + esc(m.to_address) + '</div></div>';
     }).join('');
     wrap.querySelectorAll('.conv-item').forEach(function(item){
       item.addEventListener('click', function(){
         wrap.querySelectorAll('.conv-item').forEach(function(i){ i.classList.remove('active'); });
         item.classList.add('active');
         openMailboxMessage(item.getAttribute('data-mail'));
+        openDetail('mailTwoCol');
       });
     });
   }
 
   function openMailboxMessage(id){
     activeMailboxId = id;
-    var msg = mailboxCache.find(function(m){ return m.id === id; });
+    var msg = mailboxCache.find(function(m){ return String(m.id) === String(id); });
     if(!msg) return;
 
     var reader = document.getElementById('mailboxReader');
     reader.innerHTML =
-      '<div style="margin-bottom:14px;">' +
-        '<strong style="font-size:1.05rem;">' + esc(msg.subject || '(no subject)') + '</strong><br>' +
-        '<span style="color:var(--muted);font-size:0.85rem;">From: ' + esc(msg.from_address) + ' &middot; To: ' + esc(msg.to_address) + ' &middot; ' + fmtDate(msg.created_at) + '</span>' +
+      '<h3 class="mail-subject-h">' + esc(msg.subject || '(no subject)') + '</h3>' +
+      '<div class="mail-meta">' +
+        '<div><span>From</span>' + esc(msg.from_address) + '</div>' +
+        '<div><span>To</span>' + esc(msg.to_address) + '</div>' +
+        '<div><span>Date</span>' + fmtDate(msg.created_at) + '</div>' +
       '</div>' +
-      '<div style="font-size:0.9rem;white-space:pre-wrap;line-height:1.6;">' + esc(msg.body_text || '(no text content)') + '</div>';
+      '<div class="mail-body">' + esc(mailText(msg) || '(no text content)') + '</div>';
 
     var replyForm = document.getElementById('mailboxReplyForm');
     replyForm.style.display = 'flex';
-    document.getElementById('mailboxReplySubject').value = 'Re: ' + (msg.subject || '');
+    document.getElementById('mailboxReplySubject').value = /^re:/i.test(msg.subject || '') ? msg.subject : 'Re: ' + (msg.subject || '');
     document.getElementById('mailboxReplyBody').value = '';
     document.getElementById('mailboxReplyStatus').textContent = '';
 
@@ -809,9 +999,23 @@
       supa.from('inbox_messages').update({is_read: true}).eq('id', id).then(function(){
         msg.is_read = true;
         renderMailboxList();
+        updateBadges();
       });
     }
   }
+
+  document.getElementById('mailBackBtn').addEventListener('click', function(){ closeDetail('mailTwoCol'); });
+  document.getElementById('chatBackBtn').addEventListener('click', function(){ closeDetail('chatTwoCol'); });
+  document.getElementById('mailJumpReply').addEventListener('click', function(){
+    var f = document.getElementById('mailboxReplyForm');
+    f.scrollIntoView({behavior:'smooth', block:'start'});
+    setTimeout(function(){ document.getElementById('mailboxReplyBody').focus({preventScroll:true}); }, 350);
+  });
+  document.getElementById('refreshMailboxBtn').addEventListener('click', function(){ loadMailbox(); toast('Refreshing…'); });
+  document.getElementById('refreshOrdersBtn').addEventListener('click', function(){ loadOrders(); toast('Refreshing…'); });
+  document.addEventListener('visibilitychange', function(){
+    if(!document.hidden && dashboard.style.display === 'block'){ loadMailbox(); loadOrders(); }
+  });
 
   document.getElementById('mailboxReplyForm').addEventListener('submit', function(e){
     e.preventDefault();
@@ -823,6 +1027,8 @@
     if(!body){ statusEl.textContent = 'Write a reply first.'; statusEl.style.color = 'var(--danger)'; return; }
 
     var purpose = (msg.to_address || '').indexOf('support@') !== -1 ? 'support' : 'general';
+    var replyBtn = document.getElementById('mailboxReplyBtn');
+    replyBtn.disabled = true; replyBtn.textContent = 'Sending…';
     statusEl.textContent = 'Sending…'; statusEl.style.color = 'var(--muted)';
     fetch('/api/send-email', {
       method: 'POST',
@@ -836,6 +1042,7 @@
         if(res.ok){
           statusEl.textContent = 'Reply sent.'; statusEl.style.color = 'var(--success)';
           document.getElementById('mailboxReplyBody').value = '';
+          toast('Reply sent.');
         } else {
           statusEl.textContent = 'Failed: ' + (res.data.error || 'unknown error.');
           statusEl.style.color = 'var(--danger)';
@@ -843,6 +1050,8 @@
       }).catch(function(){
         statusEl.textContent = 'Could not reach /api/send-email.';
         statusEl.style.color = 'var(--danger)';
+      }).then(function(){
+        replyBtn.disabled = false; replyBtn.textContent = 'Send Reply';
       });
   });
 
