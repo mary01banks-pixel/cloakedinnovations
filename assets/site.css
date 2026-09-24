@@ -247,6 +247,7 @@
   .cat-thumb svg{width:44px;height:44px;color:var(--teal);}
   .cat-body{padding:20px 20px 22px;display:flex;flex-direction:column;gap:10px;flex:1;}
   .cat-body h3{font-size:1.08rem;margin:0;color:#1F1602;}
+  .cat-card{scroll-margin-top:96px;}
   .cat-body p{font-size:0.95rem;margin:0;flex:1;color:#2F2203;font-weight:500;}
   body[data-page="products"] p:not(.kicker){color:#2F2203;}
   body[data-page="products"] .lede{font-weight:500;}
