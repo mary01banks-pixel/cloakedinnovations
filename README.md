@@ -41,5 +41,4 @@ vercel --prod
 
 - Double-check `index.html`, `robots.txt`, and `sitemap.xml` all reference `https://cloakedinnovations.co.ke/` (they already do)
 - Submit `https://cloakedinnovations.co.ke/sitemap.xml` in Google Search Console
-- Replace the sample/demo product categories on the Products section with the confirmed catalogue when ready
 - The contact form opens the visitor's email app (mailto) since this is a static site with no backend — if you'd like real form submissions captured server-side later, that would need a small serverless function or a form service, which Vercel supports
