@@ -113,9 +113,56 @@
   var form = document.getElementById('enquiryForm');
   var successBox = document.getElementById('formSuccess');
   var errorBox = document.getElementById('formError');
+  var errorBoxOriginal = errorBox ? errorBox.innerHTML : '';
+  var formLoadedAt = Date.now();
+  var ENQUIRY_COOLDOWN_MS = 60 * 1000;   // one enquiry per minute per browser
+  var ENQUIRY_MIN_FILL_MS = 4000;        // a person cannot complete the form faster than this
+
+  function countLinks(text){ return (String(text).match(/https?:\/\/|www\./gi) || []).length; }
+  function showFormNotice(msg){
+    if(!errorBox) return;
+    errorBox.textContent = msg;
+    errorBox.classList.add('show');
+    errorBox.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+
   if(form){
+    // Sensible length limits on every field
+    var limits = {fullName:120, orgName:160, email:254, phone:40, productNeeded:200, quantity:200, message:4000};
+    Object.keys(limits).forEach(function(id){
+      var el = document.getElementById(id);
+      if(el) el.setAttribute('maxlength', limits[id]);
+    });
+
     form.addEventListener('submit', function(e){
       e.preventDefault();
+      if(errorBox){ errorBox.innerHTML = errorBoxOriginal; errorBox.classList.remove('show'); }
+
+      // 1. Honeypot: real visitors never see or fill this field. Bots do.
+      var hp = document.getElementById('hpCheck');
+      if(hp && hp.value){
+        form.reset();
+        if(successBox) successBox.classList.add('show');   // look successful, send nothing
+        return;
+      }
+      // 2. Too fast to be a person
+      if(Date.now() - formLoadedAt < ENQUIRY_MIN_FILL_MS){
+        showFormNotice('Please take a moment to check your details, then send your enquiry again.');
+        return;
+      }
+      // 3. Cooldown between enquiries
+      try{
+        var last = parseInt(window.localStorage.getItem('cloaked-last-enquiry') || '0', 10);
+        if(last && Date.now() - last < ENQUIRY_COOLDOWN_MS){
+          showFormNotice('Your enquiry was just sent. Please wait a minute before sending another, or call us on 0796 968 241.');
+          return;
+        }
+      }catch(err){}
+      // 4. Too many links in the message
+      if(countLinks(document.getElementById('message').value) > 2){
+        showFormNotice('Your message has several links. Please remove them or email us directly.');
+        return;
+      }
       var submitBtn = form.querySelector('button[type="submit"]');
       var name = document.getElementById('fullName').value.trim();
       var org = document.getElementById('orgName').value.trim();
@@ -165,6 +212,8 @@
       }).then(function(res){
         if(res.error) throw res.error;
         form.reset();
+        formLoadedAt = Date.now();
+        try{ window.localStorage.setItem('cloaked-last-enquiry', String(Date.now())); }catch(err){}
         successBox.classList.add('show');
         successBox.scrollIntoView({behavior:'smooth', block:'center'});
       }).catch(function(){
@@ -231,6 +280,16 @@
     var startBtn = document.getElementById('chatStart');
     if(!toggle || !panel) return;
 
+    var CHAT_MIN_GAP_MS = 2000;     // at least 2 seconds between messages
+    var CHAT_MAX_MESSAGES = 40;     // per page visit
+    var CHAT_START_COOLDOWN_MS = 30 * 1000;
+    var lastChatSent = 0;
+    var chatSentCount = 0;
+    if(nameInput) nameInput.setAttribute('maxlength', 80);
+    if(emailInput) emailInput.setAttribute('maxlength', 254);
+    if(inputEl) inputEl.setAttribute('maxlength', 1000);
+    function chatLinks(text){ return (String(text).match(/https?:\/\/|www\./gi) || []).length; }
+
     function open(){ panel.classList.add('open'); toggle.setAttribute('aria-expanded','true'); }
     function close(){ panel.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); }
     toggle.addEventListener('click', function(){
@@ -286,17 +345,30 @@
 
     if(startBtn){
       startBtn.addEventListener('click', function(){
-        var name = nameInput.value.trim();
+        var name = nameInput.value.trim().slice(0, 80);
         if(!name) { nameInput.focus(); return; }
-        startConversation(name, emailInput.value.trim());
+        try{
+          var lastStart = parseInt(window.localStorage.getItem('cloaked-last-chat-start') || '0', 10);
+          if(lastStart && Date.now() - lastStart < CHAT_START_COOLDOWN_MS) return;
+          window.localStorage.setItem('cloaked-last-chat-start', String(Date.now()));
+        }catch(err){}
+        startConversation(name, emailInput.value.trim().slice(0, 254));
       });
     }
 
     if(formEl){
       formEl.addEventListener('submit', function(e){
         e.preventDefault();
-        var text = inputEl.value.trim();
+        var text = inputEl.value.trim().slice(0, 1000);
         if(!text || !conversationId) return;
+        if(Date.now() - lastChatSent < CHAT_MIN_GAP_MS) return;
+        if(chatLinks(text) > 2) return;
+        if(chatSentCount >= CHAT_MAX_MESSAGES){
+          renderMessage({sender:'admin', message:'You have reached the message limit for this visit. Please email info@cloakedinnovations.co.ke or call 0796 968 241.'});
+          return;
+        }
+        lastChatSent = Date.now();
+        chatSentCount++;
         supa.from('chat_messages').insert({
           conversation_id: conversationId, sender: 'visitor', message: text
         }).then(function(){
