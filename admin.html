@@ -235,6 +235,16 @@
     #toast{bottom:calc(20px + env(safe-area-inset-bottom));max-width:90vw;text-align:center;}
     .login-box{padding:28px 20px;}
   }
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:300;padding:16px;}
+  .modal{background:#fff;border-radius:12px;max-width:560px;width:100%;max-height:90vh;overflow:auto;padding:22px;box-shadow:0 12px 40px rgba(0,0,0,0.25);}
+  .modal h3{margin:0 0 14px;}
+  .modal .field textarea{width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:8px;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;}
+  .modal-error{color:var(--danger);font-size:0.85rem;margin-top:8px;}
+  .mail-actions,.chat-actions{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;}
+  .chat-actions{padding:10px 14px;margin:0;border-bottom:1px solid var(--line);}
+  .td-actions .btn + .btn{margin-left:6px;}
+  @media (max-width:800px){ .td-actions .btn + .btn{margin-left:0;margin-top:6px;} }
 </style>
 </head>
 <body>
@@ -363,6 +373,7 @@
           <div class="conv-list" id="convList"></div>
           <div class="chat-window detail-pane chat-pane">
             <div class="pane-bar"><button type="button" class="btn btn-outline btn-sm" id="chatBackBtn">&larr; Chats</button><strong id="chatPaneTitle"></strong></div>
+            <div class="chat-actions" id="chatActions" style="display:none;"><button type="button" class="btn btn-outline btn-sm" id="chatEmailBtn">Email visitor</button><button type="button" class="btn btn-sm btn-danger" id="chatDeleteBtn">Delete chat</button></div>
             <div class="chat-window-messages" id="chatWindowMessages">
               <div class="empty-state">Select a conversation to view messages.</div>
             </div>
@@ -606,9 +617,11 @@
       return '<tr><td data-label="Name"><strong>' + esc(c.full_name) + '</strong></td><td data-label="Organisation">' + esc(c.organisation) + '</td>' +
         '<td data-label="Email">' + (c.email ? '<a href="mailto:' + esc(c.email) + '">' + esc(c.email) + '</a>' : '') + '</td>' +
         '<td data-label="Phone">' + (c.phone ? '<a href="tel:' + esc(c.phone) + '">' + esc(c.phone) + '</a>' : '') + '</td>' +
-        '<td data-label="Added">' + fmtDate(c.created_at) + '</td></tr>';
+        '<td data-label="Added">' + fmtDate(c.created_at) + '</td>' +
+        '<td class="td-actions"><button class="btn btn-outline btn-sm" data-edit-cust="' + c.id + '">Edit</button><button class="btn btn-sm btn-danger" data-del-cust="' + c.id + '">Delete</button></td></tr>';
     }).join('');
-    wrap.innerHTML = '<table class="rtable"><thead><tr><th>Name</th><th>Organisation</th><th>Email</th><th>Phone</th><th>Added</th></tr></thead><tbody>' + rows + '</tbody></table>';
+    wrap.innerHTML = '<table class="rtable"><thead><tr><th>Name</th><th>Organisation</th><th>Email</th><th>Phone</th><th>Added</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
+    bindCustomerActions(wrap);
   }
 
   document.getElementById('addCustomerBtn').addEventListener('click', function(){
@@ -677,9 +690,10 @@
         '<td data-label="Status"><select class="status-select" data-order="' + o.id + '">' +
         ['new','in_progress','quoted','won','lost'].map(function(s){ return '<option value="' + s + '"' + (s===o.status?' selected':'') + '>' + s.replace('_',' ') + '</option>'; }).join('') +
         '</select></td><td data-label="Received">' + fmtDate(o.created_at) + '</td>' +
-        '<td class="td-actions"><button class="btn btn-sm reply-order-btn" data-order="' + o.id + '">Reply by email</button></td></tr>';
+        '<td class="td-actions"><button class="btn btn-sm reply-order-btn" data-order="' + o.id + '">Reply by email</button><button class="btn btn-outline btn-sm" data-edit-order="' + o.id + '">Edit</button><button class="btn btn-sm btn-danger" data-del-order="' + o.id + '">Delete</button></td></tr>';
     }).join('');
     wrap.innerHTML = '<table class="rtable"><thead><tr><th>Customer</th><th>Subject</th><th>Product</th><th>Qty</th><th>Message</th><th>Status</th><th>Received</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
+    bindOrderActions(wrap);
     wrap.querySelectorAll('.status-select').forEach(function(sel){
       sel.addEventListener('change', function(){
         supa.from('orders').update({status: sel.value, updated_at: new Date().toISOString()}).eq('id', sel.getAttribute('data-order')).then(function(){
@@ -731,9 +745,11 @@
     var rows = items.map(function(f){
       var custName = f.customers ? esc(f.customers.full_name) : '—';
       return '<tr><td data-label="Customer"><strong>' + custName + '</strong></td><td data-label="Note">' + esc(f.note) + '</td><td data-label="Due">' + (f.due_date || '—') + '</td>' +
-        '<td data-label="Done"><input type="checkbox" data-followup="' + f.id + '" ' + (f.done ? 'checked' : '') + '></td></tr>';
+        '<td data-label="Done"><input type="checkbox" data-followup="' + f.id + '" ' + (f.done ? 'checked' : '') + '></td>' +
+        '<td class="td-actions"><button class="btn btn-outline btn-sm" data-edit-fu="' + f.id + '">Edit</button><button class="btn btn-sm btn-danger" data-del-fu="' + f.id + '">Delete</button></td></tr>';
     }).join('');
-    wrap.innerHTML = '<table class="rtable"><thead><tr><th>Customer</th><th>Note</th><th>Due</th><th>Done</th></tr></thead><tbody>' + rows + '</tbody></table>';
+    wrap.innerHTML = '<table class="rtable"><thead><tr><th>Customer</th><th>Note</th><th>Due</th><th>Done</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
+    bindFollowupActions(wrap, items);
     wrap.querySelectorAll('[data-followup]').forEach(function(cb){
       cb.addEventListener('change', function(){
         supa.from('followups').update({done: cb.checked}).eq('id', cb.getAttribute('data-followup')).then(function(){
@@ -774,9 +790,10 @@
     var rows = items.map(function(t){
       return '<tr><td data-label="Name"><strong>' + esc(t.customer_name) + '</strong></td><td data-label="Organisation">' + esc(t.organisation) + '</td><td data-label="Quote" style="max-width:340px;">' + esc(t.quote) + '</td>' +
         '<td data-label="Approved"><label class="check-live"><input type="checkbox" data-testi="' + t.id + '" ' + (t.approved ? 'checked' : '') + '> Live on site</label></td>' +
-        '<td class="td-actions"><button class="btn btn-sm btn-danger" data-del-testi="' + t.id + '">Delete</button></td></tr>';
+        '<td class="td-actions"><button class="btn btn-outline btn-sm" data-edit-testi="' + t.id + '">Edit</button><button class="btn btn-sm btn-danger" data-del-testi="' + t.id + '">Delete</button></td></tr>';
     }).join('');
     wrap.innerHTML = '<table class="rtable"><thead><tr><th>Name</th><th>Org</th><th>Quote</th><th>Approved</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
+    bindTestimonialEdit(wrap, items);
     wrap.querySelectorAll('[data-testi]').forEach(function(cb){
       cb.addEventListener('change', function(){
         supa.from('testimonials').update({approved: cb.checked}).eq('id', cb.getAttribute('data-testi')).then(function(){
@@ -823,6 +840,7 @@
   }
 
   function renderConvList(convs){
+    convsCache = convs;
     var wrap = document.getElementById('convList');
     if(convs.length === 0){ wrap.innerHTML = '<div class="empty-state">No conversations yet.</div>'; return; }
     wrap.innerHTML = convs.map(function(c){
@@ -843,6 +861,7 @@
 
   function openConversation(convId){
     activeConvId = convId;
+    document.getElementById('chatActions').style.display = 'flex';
     document.getElementById('adminChatForm').style.display = 'flex';
     supa.from('chat_messages').select('*').eq('conversation_id', convId).order('created_at', {ascending:true}).then(function(res){
       renderChatWindow(res.data || []);
@@ -993,7 +1012,14 @@
         '<div><span>To</span>' + esc(msg.to_address) + '</div>' +
         '<div><span>Date</span>' + fmtDate(msg.created_at) + '</div>' +
       '</div>' +
+      '<div class="mail-actions">' +
+        '<button type="button" class="btn btn-outline btn-sm" data-mail-act="forward">Forward</button>' +
+        '<button type="button" class="btn btn-outline btn-sm" data-mail-act="unread">Mark unread</button>' +
+        '<button type="button" class="btn btn-outline btn-sm" data-mail-act="customer">Add as customer</button>' +
+        '<button type="button" class="btn btn-sm btn-danger" data-mail-act="delete">Delete</button>' +
+      '</div>' +
       '<div class="mail-body">' + esc(mailText(msg) || '(no text content)') + '</div>';
+    bindMailActions(msg);
 
     var replyForm = document.getElementById('mailboxReplyForm');
     replyForm.style.display = 'flex';
@@ -1098,6 +1124,279 @@
   });
 
   // ============================================================
+  // ============================================================
+  // ADMIN ACTIONS: edit, delete, forward
+  // ============================================================
+  var convsCache = [];
+
+  function escAttr(s){ return esc(s).replace(/"/g, '&quot;'); }
+
+  // Small reusable dialog. opts: title, fields[{id,label,type,value,rows}], saveLabel, onSave(values)
+  // onSave returns {error:'...'} to keep the dialog open, or anything else to close it.
+  function openModal(opts){
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    var html = '<div class="modal" role="dialog" aria-modal="true"><h3>' + esc(opts.title) + '</h3>';
+    opts.fields.forEach(function(f){
+      html += '<div class="field"><label>' + esc(f.label) + '</label>';
+      if(f.type === 'textarea'){
+        html += '<textarea data-f="' + f.id + '" rows="' + (f.rows || 4) + '">' + esc(f.value || '') + '</textarea>';
+      } else {
+        html += '<input data-f="' + f.id + '" type="' + (f.type || 'text') + '" value="' + escAttr(f.value || '') + '">';
+      }
+      html += '</div>';
+    });
+    html += '<div class="modal-error" style="display:none;"></div>' +
+      '<div class="modal-actions"><button type="button" class="btn btn-outline btn-sm" data-cancel>Cancel</button>' +
+      '<button type="button" class="btn btn-sm" data-save>' + esc(opts.saveLabel || 'Save') + '</button></div></div>';
+    overlay.innerHTML = html;
+    document.body.appendChild(overlay);
+    var saveBtn = overlay.querySelector('[data-save]');
+    var errEl = overlay.querySelector('.modal-error');
+    function onKey(e){ if(e.key === 'Escape') close(); }
+    function close(){ document.removeEventListener('keydown', onKey); if(overlay.parentNode) overlay.parentNode.removeChild(overlay); }
+    document.addEventListener('keydown', onKey);
+    overlay.addEventListener('click', function(e){ if(e.target === overlay) close(); });
+    overlay.querySelector('[data-cancel]').addEventListener('click', close);
+    var first = overlay.querySelector('[data-f]');
+    if(first) first.focus();
+    saveBtn.addEventListener('click', function(){
+      var values = {};
+      overlay.querySelectorAll('[data-f]').forEach(function(el){ values[el.getAttribute('data-f')] = el.value.trim(); });
+      var label = saveBtn.textContent;
+      errEl.style.display = 'none';
+      saveBtn.disabled = true; saveBtn.textContent = opts.busyLabel || 'Saving…';
+      function fail(msg){ errEl.textContent = msg; errEl.style.display = 'block'; saveBtn.disabled = false; saveBtn.textContent = label; }
+      Promise.resolve(opts.onSave(values)).then(function(res){
+        if(res && res.error) fail(res.error); else close();
+      }, function(){ fail('Something went wrong. Please try again.'); });
+    });
+  }
+
+  // Deletes and updates are checked: a database permission that blocks the change
+  // returns no error but also changes nothing, so we look at the returned rows.
+  var PERMISSION_HINT = 'Nothing was changed. Run supabase-admin-permissions.sql in the Supabase SQL editor.';
+  function dbDelete(table, id){
+    return supa.from(table).delete().eq('id', id).select().then(function(res){
+      if(res.error) return {ok:false, error:res.error.message};
+      if(!res.data || res.data.length === 0) return {ok:false, error:PERMISSION_HINT};
+      return {ok:true};
+    });
+  }
+  function dbUpdate(table, id, patch){
+    return supa.from(table).update(patch).eq('id', id).select().then(function(res){
+      if(res.error) return {ok:false, error:res.error.message};
+      if(!res.data || res.data.length === 0) return {ok:false, error:PERMISSION_HINT};
+      return {ok:true};
+    });
+  }
+  function findById(list, id){ return (list || []).find(function(x){ return String(x.id) === String(id); }); }
+  function addrOnly(from){ var m = /<([^>]+)>/.exec(from || ''); return (m ? m[1] : (from || '')).trim(); }
+
+  // ----- Customers
+  function bindCustomerActions(wrap){
+    wrap.querySelectorAll('[data-edit-cust]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var c = findById(customersCache, btn.getAttribute('data-edit-cust'));
+        if(!c) return;
+        openModal({title:'Edit customer', fields:[
+          {id:'full_name', label:'Name', value:c.full_name},
+          {id:'organisation', label:'Organisation', value:c.organisation},
+          {id:'email', label:'Email', type:'email', value:c.email},
+          {id:'phone', label:'Phone', value:c.phone}
+        ], onSave:function(v){
+          if(!v.full_name) return {error:'Name is required.'};
+          return dbUpdate('customers', c.id, {full_name:v.full_name, organisation:v.organisation, email:v.email, phone:v.phone}).then(function(r){
+            if(r.ok){ toast('Customer updated.'); loadCustomers(); loadOrders(); }
+            return r.ok ? {} : {error:r.error};
+          });
+        }});
+      });
+    });
+    wrap.querySelectorAll('[data-del-cust]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.getAttribute('data-del-cust');
+        var c = findById(customersCache, id);
+        if(!confirm('Delete ' + (c ? c.full_name : 'this customer') + '?\n\nTheir follow-ups will be deleted. Their orders will be kept, but no longer linked to this customer.')) return;
+        supa.from('followups').delete().eq('customer_id', id).then(function(){
+          return supa.from('orders').update({customer_id: null}).eq('customer_id', id);
+        }).then(function(r){
+          if(r && r.error){ toast('Could not unlink their orders: ' + r.error.message); return; }
+          return dbDelete('customers', id).then(function(d){
+            toast(d.ok ? 'Customer deleted.' : d.error);
+            if(d.ok){ loadCustomers(); loadOrders(); loadFollowups(); }
+          });
+        });
+      });
+    });
+  }
+
+  // ----- Orders
+  function bindOrderActions(wrap){
+    wrap.querySelectorAll('[data-edit-order]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var o = findById(ordersCache, btn.getAttribute('data-edit-order'));
+        if(!o) return;
+        openModal({title:'Edit order', fields:[
+          {id:'subject', label:'Subject', value:o.subject},
+          {id:'product_needed', label:'Product', value:o.product_needed},
+          {id:'quantity', label:'Quantity', value:o.quantity},
+          {id:'message', label:'Message', type:'textarea', rows:6, value:o.message}
+        ], onSave:function(v){
+          return dbUpdate('orders', o.id, {subject:v.subject, product_needed:v.product_needed, quantity:v.quantity, message:v.message, updated_at:new Date().toISOString()}).then(function(r){
+            if(r.ok){ toast('Order updated.'); loadOrders(); }
+            return r.ok ? {} : {error:r.error};
+          });
+        }});
+      });
+    });
+    wrap.querySelectorAll('[data-del-order]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        if(!confirm('Delete this order? This cannot be undone.')) return;
+        dbDelete('orders', btn.getAttribute('data-del-order')).then(function(d){
+          toast(d.ok ? 'Order deleted.' : d.error);
+          if(d.ok) loadOrders();
+        });
+      });
+    });
+  }
+
+  // ----- Follow-ups
+  function bindFollowupActions(wrap, items){
+    wrap.querySelectorAll('[data-edit-fu]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var f = findById(items, btn.getAttribute('data-edit-fu'));
+        if(!f) return;
+        openModal({title:'Edit follow-up', fields:[
+          {id:'note', label:'Note', type:'textarea', rows:4, value:f.note},
+          {id:'due_date', label:'Due date', type:'date', value:f.due_date || ''}
+        ], onSave:function(v){
+          if(!v.note) return {error:'A note is required.'};
+          return dbUpdate('followups', f.id, {note:v.note, due_date:v.due_date || null}).then(function(r){
+            if(r.ok){ toast('Follow-up updated.'); loadFollowups(); }
+            return r.ok ? {} : {error:r.error};
+          });
+        }});
+      });
+    });
+    wrap.querySelectorAll('[data-del-fu]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        if(!confirm('Delete this follow-up?')) return;
+        dbDelete('followups', btn.getAttribute('data-del-fu')).then(function(d){
+          toast(d.ok ? 'Follow-up deleted.' : d.error);
+          if(d.ok) loadFollowups();
+        });
+      });
+    });
+  }
+
+  // ----- Testimonials (delete already existed; this adds edit)
+  function bindTestimonialEdit(wrap, items){
+    wrap.querySelectorAll('[data-edit-testi]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var t = findById(items, btn.getAttribute('data-edit-testi'));
+        if(!t) return;
+        openModal({title:'Edit testimonial', fields:[
+          {id:'customer_name', label:'Name', value:t.customer_name},
+          {id:'organisation', label:'Organisation', value:t.organisation},
+          {id:'quote', label:'Quote', type:'textarea', rows:6, value:t.quote}
+        ], onSave:function(v){
+          if(!v.customer_name || !v.quote) return {error:'Name and quote are required.'};
+          return dbUpdate('testimonials', t.id, {customer_name:v.customer_name, organisation:v.organisation, quote:v.quote}).then(function(r){
+            if(r.ok){ toast('Testimonial updated.'); loadTestimonials(); }
+            return r.ok ? {} : {error:r.error};
+          });
+        }});
+      });
+    });
+  }
+
+  // ----- Chats
+  document.getElementById('chatDeleteBtn').addEventListener('click', function(){
+    if(!activeConvId) return;
+    if(!confirm('Delete this whole chat and all of its messages? This cannot be undone.')) return;
+    var id = activeConvId;
+    supa.from('chat_messages').delete().eq('conversation_id', id).then(function(r){
+      if(r && r.error){ toast('Could not delete the messages: ' + r.error.message); return; }
+      return dbDelete('chat_conversations', id).then(function(d){
+        toast(d.ok ? 'Chat deleted.' : d.error);
+        if(d.ok){
+          activeConvId = null;
+          document.getElementById('chatActions').style.display = 'none';
+          document.getElementById('adminChatForm').style.display = 'none';
+          document.getElementById('chatPaneTitle').textContent = '';
+          document.getElementById('chatWindowMessages').innerHTML = '<div class="empty-state">Select a conversation to view messages.</div>';
+          closeDetail('chatTwoCol');
+          loadConversations();
+        }
+      });
+    });
+  });
+  document.getElementById('chatEmailBtn').addEventListener('click', function(){
+    var c = findById(convsCache, activeConvId);
+    if(!c || !c.visitor_email){ toast('This visitor did not leave an email address.'); return; }
+    document.querySelector('nav.sidebar button[data-tab="email"]').click();
+    document.getElementById('emailCustomerSelect').value = '';
+    document.getElementById('emailTo').value = c.visitor_email;
+    document.getElementById('emailSubject').value = 'Re: your chat with Cloaked Innovations';
+    document.getElementById('emailBody').focus();
+  });
+
+  // ----- Mailbox: forward, mark unread, add as customer, delete
+  function bindMailActions(msg){
+    var reader = document.getElementById('mailboxReader');
+    var act = function(name){ return reader.querySelector('[data-mail-act="' + name + '"]'); };
+
+    act('forward').addEventListener('click', function(){
+      var body = '\n\n---------- Forwarded message ----------\nFrom: ' + msg.from_address + '\nDate: ' + fmtDate(msg.created_at) +
+        '\nSubject: ' + (msg.subject || '') + '\nTo: ' + msg.to_address + '\n\n' + mailText(msg);
+      var purpose = (msg.to_address || '').indexOf('support@') !== -1 ? 'support' : 'general';
+      openModal({title:'Forward email', saveLabel:'Send', busyLabel:'Sending…', fields:[
+        {id:'to', label:'To', type:'email', value:''},
+        {id:'subject', label:'Subject', value:/^fwd?:/i.test(msg.subject || '') ? msg.subject : 'Fwd: ' + (msg.subject || '')},
+        {id:'body', label:'Message (write your note above the forwarded text)', type:'textarea', rows:12, value:body}
+      ], onSave:function(v){
+        if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.to)) return {error:'Enter a valid email address in To.'};
+        return sendEmailApi({to:v.to, subject:v.subject, body:v.body, purpose:purpose})
+          .then(function(r){ return r.json().then(function(data){ return {ok:r.ok, data:data}; }); })
+          .then(function(res){
+            if(res.ok){ toast('Email forwarded.'); return {}; }
+            return {error:(res.data && res.data.error) || 'Could not send the email.'};
+          }, function(){ return {error:'Could not reach the server.'}; });
+      }});
+    });
+
+    act('unread').addEventListener('click', function(){
+      dbUpdate('inbox_messages', msg.id, {is_read:false}).then(function(r){
+        if(!r.ok){ toast(r.error); return; }
+        msg.is_read = false; renderMailboxList(); updateBadges(); toast('Marked as unread.');
+      });
+    });
+
+    act('customer').addEventListener('click', function(){
+      var email = addrOnly(msg.from_address);
+      var exists = customersCache.some(function(c){ return (c.email || '').toLowerCase() === email.toLowerCase(); });
+      if(exists){ toast('This sender is already a customer.'); return; }
+      supa.from('customers').insert({full_name: senderName(msg.from_address) || email, organisation:'', email:email, phone:''}).then(function(res){
+        if(res.error){ toast('Could not add customer.'); return; }
+        toast('Added to customers.'); loadCustomers();
+      });
+    });
+
+    act('delete').addEventListener('click', function(){
+      if(!confirm('Delete this email? This cannot be undone.')) return;
+      dbDelete('inbox_messages', msg.id).then(function(d){
+        if(!d.ok){ toast(d.error); return; }
+        mailboxCache = mailboxCache.filter(function(m){ return String(m.id) !== String(msg.id); });
+        activeMailboxId = null;
+        document.getElementById('mailboxReader').innerHTML = '<div class="empty-state">Select a message to read it.</div>';
+        document.getElementById('mailboxReplyForm').style.display = 'none';
+        renderMailboxList(); updateBadges(); closeDetail('mailTwoCol');
+        toast('Email deleted.');
+      });
+    });
+  }
+
   function loadAllTabs(){
     loadCustomers();
     loadOrders();
