@@ -43,7 +43,7 @@ else if(h==='home'){history.replaceState(null,'','/');}})();
   "@type": "Organization",
   "name": "Cloaked Innovations Limited",
   "url": "https://www.cloakedinnovations.co.ke/",
-  "email": "cloakedsolutionsltd@gmail.com",
+  "email": "info@cloakedinnovations.co.ke",
   "telephone": "+254796968241",
   "description": "Cloaked Innovations Limited is a Kenya-based supplier of non-pharmaceutical and equipment supplies, serving hospitals, clinics, schools, NGOs, government and private institutions, and corporate businesses across Kenya.",
   "address": {
@@ -72,21 +72,54 @@ else if(h==='home'){history.replaceState(null,'','/');}})();
       "telephone": "+254796968241",
       "email": "info@cloakedinnovations.co.ke",
       "contactType": "customer service",
-      "areaServed": "KE"
+      "areaServed": "KE",
+      "hoursAvailable": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday"
+          ],
+          "opens": "08:00",
+          "closes": "17:00"
+        },
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": "Saturday",
+          "opens": "09:00",
+          "closes": "14:00"
+        }
+      ]
     },
     {
       "@type": "ContactPoint",
       "telephone": "+254796968241",
       "email": "support@cloakedinnovations.co.ke",
       "contactType": "customer support",
-      "areaServed": "KE"
-    },
-    {
-      "@type": "ContactPoint",
-      "telephone": "+254796968241",
-      "email": "cloakedsolutionsltd@gmail.com",
-      "contactType": "sales",
-      "areaServed": "KE"
+      "areaServed": "KE",
+      "hoursAvailable": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday"
+          ],
+          "opens": "08:00",
+          "closes": "17:00"
+        },
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": "Saturday",
+          "opens": "09:00",
+          "closes": "14:00"
+        }
+      ]
     }
   ]
 }
@@ -152,7 +185,7 @@ else if(h==='home'){history.replaceState(null,'','/');}})();
       "name": "How can I request a quotation?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Use our contact form, call 0796 968 241, or email info@cloakedinnovations.co.ke or cloakedsolutionsltd@gmail.com with your requirements and our team will respond."
+        "text": "Use our contact form, call 0796 968 241, or email info@cloakedinnovations.co.ke with your requirements and our team will respond."
       }
     },
     {
@@ -180,7 +213,7 @@ else if(h==='home'){history.replaceState(null,'','/');}})();
       </span>
       <span class="brand-text">
         <strong>Cloaked Innovations</strong>
-        <span>Limited &mdash; Non-Pharmaceutical & Equipment Supplies</span>
+        <span>Limited: Non-Pharmaceutical & Equipment Supplies</span>
       </span>
     </a>
 
@@ -220,8 +253,8 @@ else if(h==='home'){history.replaceState(null,'','/');}})();
   <section class="hero">
     <div class="container hero-grid">
       <div>
-        <p class="kicker">Non-pharmaceutical & equipment supplies partner &middot; Kenya</p>
-        <h1>Non-Pharmaceutical &amp; Equipment Supplies for Institutions &mdash; Kenya</h1>
+        <p class="kicker">Your non-pharmaceutical & equipment supplies partner in Kenya</p>
+        <h1>Non-Pharmaceutical &amp; Equipment Supplies for Institutions in Kenya</h1>
         <p class="lede">Cloaked Innovations Limited supplies non-pharmaceutical and equipment supplies to institutions, organisations and businesses across Kenya. We make sourcing non-pharmaceutical & equipment supplies simple, professional and dependable.</p>
         <div class="hero-actions">
           <a href="/contact" class="btn btn-primary">Request a Quote</a>
@@ -317,7 +350,7 @@ else if(h==='home'){history.replaceState(null,'','/');}})();
         </div>
         <a href="/contact" class="btn btn-primary">Request Product Catalog</a>
       </div>
-      <p class="lede" style="margin-top:14px;">A general view of the categories we work with. Availability is confirmed at enquiry stage &mdash; contact us to confirm your specific requirements.</p>
+      <p class="lede" style="margin-top:14px;">A general view of the categories we work with. Availability is confirmed at enquiry stage. Contact us to confirm your specific requirements.</p>
       <div class="grid grid-4" style="margin-top:32px;">
         <div class="cat-card">
           <div class="cat-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
@@ -500,7 +533,7 @@ else if(h==='home'){history.replaceState(null,'','/');}})();
         </div>
         <div class="faq-item">
           <button class="faq-q" aria-expanded="false">How can I request a quotation?<span class="plus" aria-hidden="true"></span></button>
-          <div class="faq-a"><p>Use our contact form, call 0796 968 241, or email info@cloakedinnovations.co.ke or cloakedsolutionsltd@gmail.com with your requirements and our team will respond.</p></div>
+          <div class="faq-a"><p>Use our contact form, call 0796 968 241, or email info@cloakedinnovations.co.ke with your requirements and our team will respond.</p></div>
         </div>
         <div class="faq-item">
           <button class="faq-q" aria-expanded="false">Where is Cloaked Innovations Limited located?<span class="plus" aria-hidden="true"></span></button>
@@ -534,7 +567,7 @@ else if(h==='home'){history.replaceState(null,'','/');}})();
   <button class="float-btn float-btn-top" id="scrollTopBtn" aria-label="Scroll to top" type="button" style="display:none;">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
   </button>
-  <a class="float-btn float-btn-email" href="mailto:cloakedsolutionsltd@gmail.com" aria-label="Email Cloaked Innovations Limited">
+  <a class="float-btn float-btn-email" href="mailto:info@cloakedinnovations.co.ke" aria-label="Email Cloaked Innovations Limited">
     <span class="float-label" aria-hidden="true">Email us</span>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>
   </a>
@@ -612,13 +645,12 @@ else if(h==='home'){history.replaceState(null,'','/');}})();
         <li><a href="tel:+254796968241">0796 968 241</a></li>
         <li><a href="mailto:info@cloakedinnovations.co.ke">info@cloakedinnovations.co.ke</a></li>
         <li><a href="mailto:support@cloakedinnovations.co.ke">support@cloakedinnovations.co.ke</a></li>
-        <li><a href="mailto:cloakedsolutionsltd@gmail.com">cloakedsolutionsltd@gmail.com</a></li>
       </ul>
     </div>
   </div>
   <div class="container footer-bottom">
     <span>&copy; <span id="year"></span> Cloaked Innovations Limited. All rights reserved.</span>
-    <span><a href="#" onclick="return false;">Privacy Policy</a> &nbsp;&middot;&nbsp; <a href="#" onclick="return false;">Terms and Conditions</a></span>
+    <span><a href="#" onclick="return false;">Privacy Policy</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#" onclick="return false;">Terms and Conditions</a></span>
   </div>
 </footer>
 
