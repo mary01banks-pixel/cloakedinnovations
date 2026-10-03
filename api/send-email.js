@@ -42,8 +42,8 @@ export default async function handler(req, res) {
   };
   const fromEmail = fromByPurpose[purpose] || fromByPurpose.general;
   const replyTo = purpose === 'support'
-    ? (process.env.SUPPORT_REPLY_TO || 'cloakedsolutionsltd@gmail.com')
-    : (process.env.GENERAL_REPLY_TO || 'cloakedsolutionsltd@gmail.com');
+    ? (process.env.SUPPORT_REPLY_TO || 'support@cloakedinnovations.co.ke')
+    : (process.env.GENERAL_REPLY_TO || 'info@cloakedinnovations.co.ke');
 
   const payload = {
     from: fromEmail,
