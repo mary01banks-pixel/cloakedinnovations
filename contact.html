@@ -37,7 +37,7 @@
   "@type": "Organization",
   "name": "Cloaked Innovations Limited",
   "url": "https://www.cloakedinnovations.co.ke/",
-  "email": "cloakedsolutionsltd@gmail.com",
+  "email": "info@cloakedinnovations.co.ke",
   "telephone": "+254796968241",
   "description": "Cloaked Innovations Limited is a Kenya-based supplier of non-pharmaceutical and equipment supplies, serving hospitals, clinics, schools, NGOs, government and private institutions, and corporate businesses across Kenya.",
   "address": {
@@ -66,21 +66,54 @@
       "telephone": "+254796968241",
       "email": "info@cloakedinnovations.co.ke",
       "contactType": "customer service",
-      "areaServed": "KE"
+      "areaServed": "KE",
+      "hoursAvailable": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday"
+          ],
+          "opens": "08:00",
+          "closes": "17:00"
+        },
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": "Saturday",
+          "opens": "09:00",
+          "closes": "14:00"
+        }
+      ]
     },
     {
       "@type": "ContactPoint",
       "telephone": "+254796968241",
       "email": "support@cloakedinnovations.co.ke",
       "contactType": "customer support",
-      "areaServed": "KE"
-    },
-    {
-      "@type": "ContactPoint",
-      "telephone": "+254796968241",
-      "email": "cloakedsolutionsltd@gmail.com",
-      "contactType": "sales",
-      "areaServed": "KE"
+      "areaServed": "KE",
+      "hoursAvailable": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday"
+          ],
+          "opens": "08:00",
+          "closes": "17:00"
+        },
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": "Saturday",
+          "opens": "09:00",
+          "closes": "14:00"
+        }
+      ]
     }
   ]
 }
@@ -119,7 +152,7 @@
       </span>
       <span class="brand-text">
         <strong>Cloaked Innovations</strong>
-        <span>Limited &mdash; Non-Pharmaceutical & Equipment Supplies</span>
+        <span>Limited: Non-Pharmaceutical & Equipment Supplies</span>
       </span>
     </a>
 
@@ -180,23 +213,23 @@
           </div>
           <div class="contact-info-item">
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
-            <div><strong>Email</strong><a href="mailto:info@cloakedinnovations.co.ke">info@cloakedinnovations.co.ke</a><br><a href="mailto:support@cloakedinnovations.co.ke">support@cloakedinnovations.co.ke</a><br><a href="mailto:cloakedsolutionsltd@gmail.com">cloakedsolutionsltd@gmail.com</a></div>
+            <div><strong>Email</strong><a href="mailto:info@cloakedinnovations.co.ke">info@cloakedinnovations.co.ke</a><br><a href="mailto:support@cloakedinnovations.co.ke">support@cloakedinnovations.co.ke</a></div>
           </div>
         </div>
         <div class="panel" style="margin-bottom:24px;">
           <h3 style="font-size:0.98rem;margin-bottom:10px;">Business hours</h3>
-          <p style="font-size:0.9rem;margin:0;">Monday &ndash; Friday: business hours<br>Saturday: 9:00 am &ndash; 2:00 pm<br>Sunday: availability on request</p>
+          <p style="font-size:0.9rem;margin:0;">Monday to Friday: 8:00 am to 5:00 pm<br>Saturday: 9:00 am to 2:00 pm<br>Sunday: availability on request</p>
         </div>
         <div class="panel">
           <h3 style="font-size:0.98rem;">Prefer to call or email directly?</h3>
-          <p style="font-size:0.9rem;">Use the links above &mdash; on mobile, tapping the phone number will start a call and the email will open your mail app.</p>
+          <p style="font-size:0.9rem;">Use the links above. On mobile, tapping the phone number will start a call and the email will open your mail app. Email info@cloakedinnovations.co.ke for enquiries and quotations, or support@cloakedinnovations.co.ke for support.</p>
         </div>
       </div>
 
       <div class="panel">
         <h2 style="font-size:1.3rem;">Submit an enquiry</h2>
         <p style="font-size:0.92rem;margin-bottom:20px;">Complete the form below and our team will receive your enquiry directly.</p>
-        <div class="form-success" id="formSuccess" role="status"><strong>Thank you &mdash; your enquiry has been received.</strong> Our team will review your requirements and get back to you by email or phone as soon as possible.</div>
+        <div class="form-success" id="formSuccess" role="status"><strong>Thank you. Your enquiry has been received.</strong> Our team will review your requirements and get back to you by email or phone as soon as possible.</div>
         <div class="form-error" id="formError" role="alert"><strong>Sorry, we couldn't send your enquiry.</strong> Please try again in a moment, or contact us directly at <a href="mailto:info@cloakedinnovations.co.ke">info@cloakedinnovations.co.ke</a> or call <a href="tel:+254796968241">0796 968 241</a>.</div>
         <form class="enquiry-form" id="enquiryForm">
           <div class="form-row">
@@ -241,7 +274,7 @@
             <textarea id="message" name="message" required placeholder="Tell us more about what your organisation needs"></textarea>
           </div>
           <button type="submit" class="btn btn-primary btn-block">Submit enquiry</button>
-          <p class="field-hint">By submitting, your enquiry is sent securely to our team. We'll respond as soon as possible.</p>
+          <p class="field-hint">By submitting, your enquiry is sent securely to our team. We'll respond as soon as possible. See our <a href="/privacy">Privacy Policy</a> for how we use your details.</p>
         </form>
       </div>
     </div>
@@ -253,7 +286,7 @@
   <button class="float-btn float-btn-top" id="scrollTopBtn" aria-label="Scroll to top" type="button" style="display:none;">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
   </button>
-  <a class="float-btn float-btn-email" href="mailto:cloakedsolutionsltd@gmail.com" aria-label="Email Cloaked Innovations Limited">
+  <a class="float-btn float-btn-email" href="mailto:info@cloakedinnovations.co.ke" aria-label="Email Cloaked Innovations Limited">
     <span class="float-label" aria-hidden="true">Email us</span>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>
   </a>
@@ -331,13 +364,12 @@
         <li><a href="tel:+254796968241">0796 968 241</a></li>
         <li><a href="mailto:info@cloakedinnovations.co.ke">info@cloakedinnovations.co.ke</a></li>
         <li><a href="mailto:support@cloakedinnovations.co.ke">support@cloakedinnovations.co.ke</a></li>
-        <li><a href="mailto:cloakedsolutionsltd@gmail.com">cloakedsolutionsltd@gmail.com</a></li>
       </ul>
     </div>
   </div>
   <div class="container footer-bottom">
     <span>&copy; <span id="year"></span> Cloaked Innovations Limited. All rights reserved.</span>
-    <span><a href="#" onclick="return false;">Privacy Policy</a> &nbsp;&middot;&nbsp; <a href="#" onclick="return false;">Terms and Conditions</a></span>
+    <span><a href="/privacy">Privacy Policy</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="/terms">Terms and Conditions</a></span>
   </div>
 </footer>
 
