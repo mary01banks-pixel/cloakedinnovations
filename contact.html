@@ -35,8 +35,15 @@
 {
   "@context": "https://schema.org",
   "@type": "Organization",
+  "@id": "https://www.cloakedinnovations.co.ke/#organization",
   "name": "Cloaked Innovations Limited",
   "url": "https://www.cloakedinnovations.co.ke/",
+  "logo": {
+    "@type": "ImageObject",
+    "url": "https://www.cloakedinnovations.co.ke/assets/img/android-chrome-512x512.png",
+    "width": 512,
+    "height": 512
+  },
   "email": "info@cloakedinnovations.co.ke",
   "telephone": "+254796968241",
   "description": "Cloaked Innovations Limited is a Kenya-based supplier of non-pharmaceutical and equipment supplies, serving hospitals, clinics, schools, NGOs, government and private institutions, and corporate businesses across Kenya.",
@@ -273,6 +280,7 @@
             <label for="message">Message</label>
             <textarea id="message" name="message" required placeholder="Tell us more about what your organisation needs"></textarea>
           </div>
+          <div aria-hidden="true" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;"><label for="hpCheck">Leave this field empty</label><input type="text" id="hpCheck" name="hp_check" tabindex="-1" autocomplete="off"></div>
           <button type="submit" class="btn btn-primary btn-block">Submit enquiry</button>
           <p class="field-hint">By submitting, your enquiry is sent securely to our team. We'll respond as soon as possible. See our <a href="/privacy">Privacy Policy</a> for how we use your details.</p>
         </form>
