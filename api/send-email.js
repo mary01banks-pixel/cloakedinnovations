@@ -7,6 +7,9 @@
 //   Project → Settings → Environment Variables
 //
 //   RESEND_API_KEY        = re_xxxxxxxxxxxxxxxxxxxxxxxx
+//   ADMIN_EMAIL           = the email address of your admin login (comma separated if more than one)
+//   SUPABASE_URL          = https://xxxxx.supabase.co   (already used by inbound-email.js)
+//   SUPABASE_ANON_KEY     = your anon key (if not set, SUPABASE_SERVICE_ROLE_KEY is used)
 //   GENERAL_FROM_EMAIL    = Cloaked Innovations Limited <info@cloakedinnovations.co.ke>
 //   SUPPORT_FROM_EMAIL    = Cloaked Innovations Limited Support <support@cloakedinnovations.co.ke>
 //
@@ -14,10 +17,39 @@
 // (noreply@ is NOT sent from here — that one is configured directly in
 // Supabase's SMTP settings for auth emails, not through this function.)
 //
-// No admin auth check is done here beyond requiring the fields, since
-// the admin panel itself is gated by Supabase Auth before this is ever
-// called from the browser. If you want to harden this further later, you
-// can verify a Supabase session token passed in the request here too.
+// Only a logged in admin can call this endpoint. The admin panel sends its
+// Supabase session token as "Authorization: Bearer <token>", and this function
+// confirms with Supabase that the token belongs to an address in ADMIN_EMAIL.
+// An admin can send to any recipient; everyone else gets a 401 or 403.
+
+async function checkAdmin(req) {
+  const header = req.headers['authorization'] || '';
+  const token = header.startsWith('Bearer ') ? header.slice(7).trim() : '';
+  if (!token) return { ok: false, status: 401, error: 'Please log in to the admin panel to send email.' };
+
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const apiKey = process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const admins = (process.env.ADMIN_EMAIL || '')
+    .split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
+  if (!supabaseUrl || !apiKey || admins.length === 0) {
+    return { ok: false, status: 500, error: 'Server setup incomplete: set SUPABASE_URL, SUPABASE_ANON_KEY and ADMIN_EMAIL in Vercel.' };
+  }
+
+  try {
+    const r = await fetch(`${supabaseUrl}/auth/v1/user`, {
+      headers: { Authorization: `Bearer ${token}`, apikey: apiKey }
+    });
+    if (!r.ok) return { ok: false, status: 401, error: 'Your admin session has expired. Please log in again.' };
+    const user = await r.json();
+    const email = String((user && user.email) || '').toLowerCase();
+    if (!email || !admins.includes(email)) {
+      return { ok: false, status: 403, error: 'This account is not allowed to send email.' };
+    }
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, status: 500, error: 'Could not verify your login. Please try again.' };
+  }
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -25,10 +57,19 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  const admin = await checkAdmin(req);
+  if (!admin.ok) {
+    return res.status(admin.status).json({ error: admin.error });
+  }
+
   const { to, subject, body, purpose, inReplyTo } = req.body || {};
 
   if (!to || !subject || !body) {
     return res.status(400).json({ error: 'Missing required fields: to, subject, body' });
+  }
+
+  if (typeof to !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to.trim())) {
+    return res.status(400).json({ error: 'Please enter one valid recipient email address.' });
   }
 
   const apiKey = process.env.RESEND_API_KEY;
@@ -47,7 +88,7 @@ export default async function handler(req, res) {
 
   const payload = {
     from: fromEmail,
-    to: [to],
+    to: [to.trim()],
     subject: subject,
     text: body,
     reply_to: replyTo
