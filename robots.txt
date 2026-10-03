@@ -1,42 +1,71 @@
-# General web crawlers
+# Public pages are open to search engines and AI assistants.
+# The admin panel and server functions are not for crawlers.
+
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /api/
 
-# AI answer/search engines and assistants (GEO) — explicitly welcomed
+# AI answer and search engines and assistants (GEO), explicitly welcomed
+
 User-agent: GPTBot
 Allow: /
+Disallow: /admin
+Disallow: /api/
 
 User-agent: ChatGPT-User
 Allow: /
+Disallow: /admin
+Disallow: /api/
 
 User-agent: OAI-SearchBot
 Allow: /
+Disallow: /admin
+Disallow: /api/
 
 User-agent: Google-Extended
 Allow: /
+Disallow: /admin
+Disallow: /api/
 
 User-agent: ClaudeBot
 Allow: /
+Disallow: /admin
+Disallow: /api/
 
 User-agent: Claude-Web
 Allow: /
+Disallow: /admin
+Disallow: /api/
 
 User-agent: anthropic-ai
 Allow: /
+Disallow: /admin
+Disallow: /api/
 
 User-agent: PerplexityBot
 Allow: /
+Disallow: /admin
+Disallow: /api/
 
 User-agent: Perplexity-User
 Allow: /
+Disallow: /admin
+Disallow: /api/
 
 User-agent: CCBot
 Allow: /
+Disallow: /admin
+Disallow: /api/
 
 User-agent: Applebot-Extended
 Allow: /
+Disallow: /admin
+Disallow: /api/
 
 User-agent: Bingbot
 Allow: /
+Disallow: /admin
+Disallow: /api/
 
 Sitemap: https://www.cloakedinnovations.co.ke/sitemap.xml
