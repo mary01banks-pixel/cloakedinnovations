@@ -1036,14 +1036,10 @@
     var replyBtn = document.getElementById('mailboxReplyBtn');
     replyBtn.disabled = true; replyBtn.textContent = 'Sending…';
     statusEl.textContent = 'Sending…'; statusEl.style.color = 'var(--muted)';
-    fetch('/api/send-email', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
+    sendEmailApi({
         to: msg.from_address, subject: subject, body: body,
         purpose: purpose, inReplyTo: msg.message_id
-      })
-    }).then(function(r){ return r.json().then(function(data){ return {ok: r.ok, data: data}; }); })
+      }).then(function(r){ return r.json().then(function(data){ return {ok: r.ok, data: data}; }); })
       .then(function(res){
         if(res.ok){
           statusEl.textContent = 'Reply sent.'; statusEl.style.color = 'var(--success)';
@@ -1061,6 +1057,19 @@
       });
   });
 
+  // Sends an email through the server. The admin login token is attached so
+  // the server can confirm the request comes from a logged in admin.
+  function sendEmailApi(payload){
+    return supa.auth.getSession().then(function(res){
+      var token = (res && res.data && res.data.session) ? res.data.session.access_token : '';
+      return fetch('/api/send-email', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json', 'Authorization': 'Bearer ' + token},
+        body: JSON.stringify(payload)
+      });
+    });
+  }
+
   // ============================================================
   // EMAIL CUSTOMER
   // ============================================================
@@ -1072,11 +1081,7 @@
     var statusEl = document.getElementById('emailStatus');
     if(!to || !subject || !body){ statusEl.textContent = 'Please fill in recipient, subject and message.'; statusEl.style.color = 'var(--danger)'; return; }
     statusEl.textContent = 'Sending…'; statusEl.style.color = 'var(--muted)';
-    fetch('/api/send-email', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({to: to, subject: subject, body: body, purpose: purpose})
-    }).then(function(r){ return r.json().then(function(data){ return {ok: r.ok, data: data}; }); })
+    sendEmailApi({to: to, subject: subject, body: body, purpose: purpose}).then(function(r){ return r.json().then(function(data){ return {ok: r.ok, data: data}; }); })
       .then(function(res){
         if(res.ok){
           statusEl.textContent = 'Email sent.'; statusEl.style.color = 'var(--success)';
