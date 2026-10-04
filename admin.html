@@ -1469,10 +1469,10 @@
     var rows = teamCache.map(function(a){
       var you = a.email.toLowerCase() === myEmail;
       return '<tr><td data-label="Name"><strong>' + esc(a.name || '') + '</strong></td>' +
-        '<td data-label="Email">' + esc(a.email) + (you ? ' <em>(you)</em>' : '') + '</td>' +
+        '<td data-label="Email">' + esc(a.email) + (a.role === 'owner' ? ' <span class="nav-badge" style="display:inline-block;">Owner</span>' : '') + (you ? ' <em>(you)</em>' : '') + '</td>' +
         '<td data-label="Added">' + fmtDate(a.created_at) + '</td>' +
         '<td class="td-actions"><button class="btn btn-outline btn-sm" data-resend-admin="' + esc(a.email) + '">Send new sign-in link</button>' +
-        (you ? '' : '<button class="btn btn-sm btn-danger" data-remove-admin="' + esc(a.email) + '">Remove</button>') + '</td></tr>';
+        ((you || a.role === 'owner') ? '' : '<button class="btn btn-sm btn-danger" data-remove-admin="' + esc(a.email) + '">Remove</button>') + '</td></tr>';
     }).join('');
     wrap.innerHTML = '<table class="rtable"><thead><tr><th>Name</th><th>Email</th><th>Added</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
 
