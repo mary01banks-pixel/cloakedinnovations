@@ -142,6 +142,11 @@ export default async function handler(req, res) {
       if (email === admin.email) {
         return res.status(400).json({ error: 'You cannot remove your own access. Ask another admin to do it.' });
       }
+      const target = await fetch(`${supabaseUrl}/rest/v1/admins?select=role&email=eq.${encodeURIComponent(email)}&limit=1`, { headers: svc });
+      const targetRows = target.ok ? await target.json() : [];
+      if (targetRows.length && targetRows[0].role === 'owner') {
+        return res.status(400).json({ error: 'The owner cannot be removed.' });
+      }
       const all = await fetch(`${supabaseUrl}/rest/v1/admins?select=email`, { headers: svc });
       const list = all.ok ? await all.json() : [];
       if (list.length <= 1) {
