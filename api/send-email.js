@@ -7,9 +7,8 @@
 //   Project → Settings → Environment Variables
 //
 //   RESEND_API_KEY        = re_xxxxxxxxxxxxxxxxxxxxxxxx
-//   ADMIN_EMAIL           = the email address of your admin login (comma separated if more than one)
-//   SUPABASE_URL          = https://xxxxx.supabase.co   (already used by inbound-email.js)
-//   SUPABASE_ANON_KEY     = your anon key (if not set, SUPABASE_SERVICE_ROLE_KEY is used)
+//   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (used to check who is logged in)
+//   ADMIN_EMAIL (optional backup) = an email that is always allowed to send
 //   GENERAL_FROM_EMAIL    = Cloaked Innovations Limited <info@cloakedinnovations.co.ke>
 //   SUPPORT_FROM_EMAIL    = Cloaked Innovations Limited Support <support@cloakedinnovations.co.ke>
 //
@@ -19,37 +18,11 @@
 //
 // Only a logged in admin can call this endpoint. The admin panel sends its
 // Supabase session token as "Authorization: Bearer <token>", and this function
-// confirms with Supabase that the token belongs to an address in ADMIN_EMAIL.
+// confirms with Supabase that the login is on the admin list (Team tab).
 // An admin can send to any recipient; everyone else gets a 401 or 403.
 
-async function checkAdmin(req) {
-  const header = req.headers['authorization'] || '';
-  const token = header.startsWith('Bearer ') ? header.slice(7).trim() : '';
-  if (!token) return { ok: false, status: 401, error: 'Please log in to the admin panel to send email.' };
 
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const apiKey = process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const admins = (process.env.ADMIN_EMAIL || '')
-    .split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
-  if (!supabaseUrl || !apiKey || admins.length === 0) {
-    return { ok: false, status: 500, error: 'Server setup incomplete: set SUPABASE_URL, SUPABASE_ANON_KEY and ADMIN_EMAIL in Vercel.' };
-  }
-
-  try {
-    const r = await fetch(`${supabaseUrl}/auth/v1/user`, {
-      headers: { Authorization: `Bearer ${token}`, apikey: apiKey }
-    });
-    if (!r.ok) return { ok: false, status: 401, error: 'Your admin session has expired. Please log in again.' };
-    const user = await r.json();
-    const email = String((user && user.email) || '').toLowerCase();
-    if (!email || !admins.includes(email)) {
-      return { ok: false, status: 403, error: 'This account is not allowed to send email.' };
-    }
-    return { ok: true };
-  } catch (err) {
-    return { ok: false, status: 500, error: 'Could not verify your login. Please try again.' };
-  }
-}
+import { checkAdmin } from './_lib/admin-auth.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
