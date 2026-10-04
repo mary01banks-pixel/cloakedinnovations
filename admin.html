@@ -293,6 +293,7 @@
       <button data-tab="analytics">Analytics</button>
       <button data-tab="mailbox">Mailbox <span class="nav-badge" id="badgeMail"></span></button>
       <button data-tab="email">Email Customer</button>
+      <button data-tab="team">Team</button>
     </nav>
     <main class="content">
 
@@ -458,6 +459,26 @@
         </div>
       </section>
 
+      <!-- TEAM -->
+      <section class="tab-panel" id="tab-team">
+        <h2>Team</h2>
+        <p class="tab-sub">People who can sign in to this admin panel. Adding someone emails them a link to set their own password.</p>
+        <div class="card">
+          <strong>Add an admin</strong>
+          <div class="form-grid form-grid-cust">
+            <div class="field" style="margin:0;"><label>Name</label><input type="text" id="newAdminName"></div>
+            <div class="field" style="margin:0;"><label>Email</label><input type="email" id="newAdminEmail"></div>
+            <button class="btn btn-sm" id="addAdminBtn">Add and send invite</button>
+          </div>
+        </div>
+        <div id="teamTableWrap"></div>
+        <div class="card" style="margin-top:16px;">
+          <strong>Your account</strong>
+          <p class="tab-sub" style="margin:6px 0 12px;">Signed in as <span id="teamMe"></span></p>
+          <button class="btn btn-outline btn-sm" id="changePasswordBtn" type="button">Change my password</button>
+        </div>
+      </section>
+
     </main>
   </div>
 </div>
@@ -471,7 +492,6 @@
   // ============================================================
   var SUPABASE_URL = "https://swguesxklmbfwanxzjjt.supabase.co";
   var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3Z3Vlc3hrbG1iZndhbnh6amp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MzQ3OTIsImV4cCI6MjEwNTUxMDc5Mn0.N6636rHeofqQl_sNylzVgIKrno5jpWQmrNwS3OHh488";
-  var ADMIN_EMAIL = "cloakedsolutionsltd@gmail.com"; // must match the email in supabase-schema.sql policies
 
   if (SUPABASE_URL.indexOf("YOUR_SUPABASE") !== -1) {
     document.getElementById('configWarning').style.display = 'block';
@@ -490,12 +510,22 @@
   var loginScreen = document.getElementById('loginScreen');
   var dashboard = document.getElementById('dashboard');
 
+  // Is this signed in person on the admin list? If the admins table has not been
+  // created yet we let the sign in through (the database rules still protect the data).
+  function verifyAdmin(user){
+    var email = ((user && user.email) || '').toLowerCase();
+    return supa.from('admins').select('email').eq('email', email).limit(1).then(function(res){
+      if(res.error) return true;
+      return !!(res.data && res.data.length);
+    });
+  }
+
   function checkSession(){
     if(!supa) return;
     supa.auth.getSession().then(function(res){
       var session = res.data.session;
-      if(session && session.user && session.user.email === ADMIN_EMAIL){
-        showDashboard();
+      if(session && session.user){
+        verifyAdmin(session.user).then(function(ok){ if(ok) showDashboard(); });
       }
     });
   }
@@ -504,17 +534,20 @@
     if(!supa){ toast('Supabase is not configured yet.'); return; }
     var email = document.getElementById('loginEmail').value.trim();
     var password = document.getElementById('loginPassword').value;
+    var errBox = document.getElementById('loginError');
     supa.auth.signInWithPassword({email: email, password: password}).then(function(res){
-      if(res.error || !res.data.user || res.data.user.email !== ADMIN_EMAIL){
-        document.getElementById('loginError').style.display = 'block';
-        if(res.data && res.data.user && res.data.user.email !== ADMIN_EMAIL){
-          supa.auth.signOut();
-        }
-        return;
-      }
-      document.getElementById('loginError').style.display = 'none';
-      showDashboard();
+      if(res.error || !res.data.user){ errBox.style.display = 'block'; return; }
+      verifyAdmin(res.data.user).then(function(ok){
+        if(!ok){ errBox.style.display = 'block'; supa.auth.signOut(); return; }
+        errBox.style.display = 'none';
+        showDashboard();
+      });
     });
+  });
+
+  // When someone opens a "set your password" link from their invite email
+  supa && supa.auth.onAuthStateChange(function(event){
+    if(event === 'PASSWORD_RECOVERY'){ setTimeout(promptNewPassword, 700); }
   });
 
   document.getElementById('logoutBtn').addEventListener('click', function(){
@@ -1162,7 +1195,7 @@
     if(first) first.focus();
     saveBtn.addEventListener('click', function(){
       var values = {};
-      overlay.querySelectorAll('[data-f]').forEach(function(el){ values[el.getAttribute('data-f')] = el.value.trim(); });
+      overlay.querySelectorAll('[data-f]').forEach(function(el){ values[el.getAttribute('data-f')] = (el.type === 'password') ? el.value : el.value.trim(); });
       var label = saveBtn.textContent;
       errEl.style.display = 'none';
       saveBtn.disabled = true; saveBtn.textContent = opts.busyLabel || 'Saving…';
@@ -1397,6 +1430,114 @@
     });
   }
 
+  // ============================================================
+  // TEAM: add and remove admins, change password
+  // ============================================================
+  var teamCache = [];
+  var myEmail = '';
+
+  function callAdminApi(payload){
+    return supa.auth.getSession().then(function(res){
+      var token = (res && res.data && res.data.session) ? res.data.session.access_token : '';
+      return fetch('/api/manage-admins', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json', 'Authorization': 'Bearer ' + token},
+        body: JSON.stringify(payload)
+      }).then(function(r){ return r.json().then(function(data){ return {ok:r.ok, data:data}; }); });
+    });
+  }
+
+  function loadTeam(){
+    supa.auth.getSession().then(function(s){
+      myEmail = ((s.data.session && s.data.session.user && s.data.session.user.email) || '').toLowerCase();
+      var me = document.getElementById('teamMe'); if(me) me.textContent = myEmail;
+      return supa.from('admins').select('*').order('created_at', {ascending:true});
+    }).then(function(res){
+      var wrap = document.getElementById('teamTableWrap');
+      if(res.error){
+        wrap.innerHTML = '<div class="empty-state">The team list is not set up yet. Run supabase-admin-team.sql in the Supabase SQL editor.</div>';
+        return;
+      }
+      teamCache = res.data || [];
+      renderTeam();
+    });
+  }
+
+  function renderTeam(){
+    var wrap = document.getElementById('teamTableWrap');
+    if(teamCache.length === 0){ wrap.innerHTML = '<div class="empty-state">No admins listed yet.</div>'; return; }
+    var rows = teamCache.map(function(a){
+      var you = a.email.toLowerCase() === myEmail;
+      return '<tr><td data-label="Name"><strong>' + esc(a.name || '') + '</strong></td>' +
+        '<td data-label="Email">' + esc(a.email) + (you ? ' <em>(you)</em>' : '') + '</td>' +
+        '<td data-label="Added">' + fmtDate(a.created_at) + '</td>' +
+        '<td class="td-actions"><button class="btn btn-outline btn-sm" data-resend-admin="' + esc(a.email) + '">Send new sign-in link</button>' +
+        (you ? '' : '<button class="btn btn-sm btn-danger" data-remove-admin="' + esc(a.email) + '">Remove</button>') + '</td></tr>';
+    }).join('');
+    wrap.innerHTML = '<table class="rtable"><thead><tr><th>Name</th><th>Email</th><th>Added</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
+
+    wrap.querySelectorAll('[data-resend-admin]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var email = btn.getAttribute('data-resend-admin');
+        if(!confirm('Email a new sign-in link to ' + email + '?')) return;
+        btn.disabled = true;
+        callAdminApi({action:'resend', email:email}).then(function(res){
+          btn.disabled = false;
+          reportInvite(res, email);
+        }, function(){ btn.disabled = false; toast('Could not reach the server.'); });
+      });
+    });
+    wrap.querySelectorAll('[data-remove-admin]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var email = btn.getAttribute('data-remove-admin');
+        if(!confirm('Remove ' + email + '? They will no longer be able to sign in to the admin panel.')) return;
+        callAdminApi({action:'remove', email:email}).then(function(res){
+          toast(res.ok ? 'Admin removed.' : ((res.data && res.data.error) || 'Could not remove the admin.'));
+          if(res.ok) loadTeam();
+        }, function(){ toast('Could not reach the server.'); });
+      });
+    });
+  }
+
+  function reportInvite(res, email){
+    if(!res.ok){ toast((res.data && res.data.error) || 'Something went wrong.'); return; }
+    if(res.data.emailed){ toast('Sign-in link sent to ' + email + '.'); return; }
+    window.prompt('The email could not be sent. Copy this link and send it to ' + email + ' yourself:', res.data.inviteLink || '');
+  }
+
+  document.getElementById('addAdminBtn').addEventListener('click', function(){
+    var nameEl = document.getElementById('newAdminName');
+    var emailEl = document.getElementById('newAdminEmail');
+    var email = emailEl.value.trim().toLowerCase();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ toast('Enter a valid email address.'); return; }
+    var btn = this;
+    btn.disabled = true; btn.textContent = 'Adding…';
+    callAdminApi({action:'add', email:email, name:nameEl.value.trim()}).then(function(res){
+      if(res.ok){ nameEl.value = ''; emailEl.value = ''; loadTeam(); }
+      else if(res.data && res.data.added){ loadTeam(); }
+      reportInvite(res, email);
+    }, function(){ toast('Could not reach the server.'); }).then(function(){
+      btn.disabled = false; btn.textContent = 'Add and send invite';
+    });
+  });
+
+  function promptNewPassword(){
+    openModal({title:'Set your password', saveLabel:'Save password', fields:[
+      {id:'pw1', label:'New password (at least 8 characters)', type:'password'},
+      {id:'pw2', label:'Type it again', type:'password'}
+    ], onSave:function(v){
+      if(v.pw1.length < 8) return {error:'Use at least 8 characters.'};
+      if(v.pw1 !== v.pw2) return {error:'The two passwords do not match.'};
+      return supa.auth.updateUser({password: v.pw1}).then(function(res){
+        if(res.error) return {error: res.error.message};
+        toast('Password saved.');
+        if(window.history && window.history.replaceState){ window.history.replaceState(null, '', location.pathname); }
+        return {};
+      });
+    }});
+  }
+  document.getElementById('changePasswordBtn').addEventListener('click', promptNewPassword);
+
   function loadAllTabs(){
     loadCustomers();
     loadOrders();
@@ -1406,6 +1547,7 @@
     loadAnalytics();
     loadOverviewStats();
     loadMailbox();
+    loadTeam();
   }
 })();
 </script>
