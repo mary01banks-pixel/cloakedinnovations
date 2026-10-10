@@ -91,7 +91,40 @@ export default async function handler(req, res) {
       return res.status(resendRes.status).json({ error: data.message || 'Resend rejected the request.' });
     }
 
-    return res.status(200).json({ success: true, id: data.id });
+    // Keep a copy in the Sent folder of the admin mailbox. If this fails the
+    // email has still been sent, so it never turns the response into an error.
+    let saved = false;
+    try {
+      const supabaseUrl = process.env.SUPABASE_URL;
+      const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      if (supabaseUrl && serviceKey) {
+        const ins = await fetch(`${supabaseUrl}/rest/v1/inbox_messages`, {
+          method: 'POST',
+          headers: {
+            apikey: serviceKey,
+            Authorization: `Bearer ${serviceKey}`,
+            'Content-Type': 'application/json',
+            Prefer: 'return=minimal'
+          },
+          body: JSON.stringify({
+            direction: 'outbound',
+            folder: 'sent',
+            from_address: fromEmail,
+            to_address: to.trim(),
+            subject: subject,
+            body_text: body,
+            resend_email_id: data.id || null,
+            in_reply_to: inReplyTo || null,
+            is_read: true
+          })
+        });
+        saved = ins.ok;
+      }
+    } catch (e) {
+      saved = false;
+    }
+
+    return res.status(200).json({ success: true, id: data.id, saved });
   } catch (err) {
     return res.status(500).json({ error: 'Unexpected server error sending email.' });
   }
