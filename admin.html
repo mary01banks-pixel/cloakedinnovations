@@ -245,6 +245,48 @@
   .chat-actions{padding:10px 14px;margin:0;border-bottom:1px solid var(--line);}
   .td-actions .btn + .btn{margin-left:6px;}
   @media (max-width:800px){ .td-actions .btn + .btn{margin-left:0;margin-top:6px;} }
+  @media (min-width:801px){ #mailTwoCol{grid-template-columns:390px 1fr;} }
+  .mail-left{display:flex;flex-direction:column;overflow:hidden;}
+  #mailboxList{overflow-y:auto;flex:1;min-height:0;}
+  .mail-folders{display:flex;flex-wrap:wrap;gap:6px;padding:10px;border-bottom:1px solid var(--line);}
+  .mail-folder{border:1px solid var(--line);background:#fff;border-radius:999px;padding:4px 10px;font-size:0.78rem;cursor:pointer;font-family:inherit;color:inherit;}
+  .mail-folder.active{background:var(--teal);color:#fff;border-color:var(--teal);}
+  .mail-folder b{margin-left:4px;}
+  .mail-searchbar{padding:8px 10px;border-bottom:1px solid var(--line);}
+  .mail-searchbar input{width:100%;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font-family:inherit;font-size:0.85rem;}
+  .mail-bulk{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:6px 10px;border-bottom:1px solid var(--line);font-size:0.78rem;min-height:36px;}
+  .mail-row1{display:flex;align-items:center;gap:6px;}
+  .mail-row1 .mail-from{flex:1;}
+  .mail-check{margin:0;flex-shrink:0;}
+  .mail-star{background:none;border:none;cursor:pointer;font-size:1rem;line-height:1;color:#b9c0c9;padding:0 2px;flex-shrink:0;}
+  .mail-star.on{color:#e0a100;}
+  .draft-tag{color:var(--danger);font-weight:700;}
+  .mail-chip{display:inline-block;font-size:0.66rem;border:1px solid var(--line);border-radius:999px;padding:0 6px;margin-right:4px;}
+  .thread-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+  .tmsg{border:1px solid var(--line);border-radius:10px;margin:0 0 10px;background:#fff;}
+  .tmsg.out{background:#f1f7f6;}
+  .tmsg-head{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;cursor:pointer;}
+  .tmsg-avatar{width:30px;height:30px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;}
+  .tmsg.out .tmsg-avatar{background:var(--teal-deep, #12594f);}
+  .tmsg-who{flex:1;min-width:0;font-size:0.85rem;}
+  .tmsg-addr{color:var(--muted);font-size:0.76rem;overflow-wrap:anywhere;}
+  .tmsg-to{color:var(--muted);font-size:0.76rem;}
+  .tmsg-date{font-size:0.74rem;color:var(--muted);flex-shrink:0;}
+  .tmsg-snippet{display:none;padding:0 12px 10px 52px;font-size:0.8rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .tmsg-body{padding:0 14px 12px 52px;font-size:0.93rem;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;}
+  .tmsg.collapsed .tmsg-body, .tmsg.collapsed .tmsg-actions{display:none;}
+  .tmsg.collapsed .tmsg-snippet{display:block;}
+  .tmsg-quoted{display:none;margin-top:8px;padding-left:10px;border-left:3px solid var(--line);color:var(--muted);}
+  .tmsg-quoted.open{display:block;}
+  .tmsg-trim{display:inline-block;margin-top:6px;border:1px solid var(--line);background:#f3f5f7;border-radius:6px;padding:0 8px;font-size:0.8rem;cursor:pointer;line-height:1.3;}
+  .tmsg-actions{display:flex;gap:8px;padding:0 14px 12px 52px;}
+  .thread-reply-bar{display:flex;gap:8px;margin:4px 0 12px;}
+  .composer{border:1px solid var(--line);border-radius:10px;padding:12px;background:#fff;display:grid;gap:8px;margin-top:6px;}
+  .composer h4{margin:0 0 2px;font-size:0.95rem;}
+  .composer label{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:var(--muted);}
+  .composer input, .composer select, .composer textarea{width:100%;padding:9px 11px;border:1.5px solid var(--line);border-radius:8px;font-family:inherit;font-size:0.9rem;}
+  .composer-note{font-size:0.76rem;color:var(--muted);}
+  .composer-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
 </style>
 </head>
 <body>
@@ -404,24 +446,23 @@
       <!-- MAILBOX -->
       <section class="tab-panel" id="tab-mailbox">
         <div class="tab-head"><div><h2>Mailbox</h2>
-        <p class="tab-sub">Emails received at info@ and support@.</p></div>
-        <button class="btn btn-outline btn-sm" id="refreshMailboxBtn" type="button">&#8635; Refresh</button></div>
+        <p class="tab-sub">Emails to and from info@ and support@.</p></div>
+        <div style="display:flex;gap:8px;"><button class="btn btn-sm" id="composeBtn" type="button">Compose</button>
+        <button class="btn btn-outline btn-sm" id="refreshMailboxBtn" type="button">&#8635; Refresh</button></div></div>
         <div class="two-col" id="mailTwoCol">
-          <div class="conv-list" id="mailboxList"></div>
+          <div class="conv-list mail-left">
+            <div class="mail-folders" id="mailFolders"></div>
+            <div class="mail-searchbar"><input type="search" id="mailSearch" placeholder="Search mail"></div>
+            <div class="mail-bulk" id="mailBulk"></div>
+            <div id="mailboxList"></div>
+          </div>
           <div class="chat-window detail-pane mail-pane">
             <div class="pane-bar">
-              <button type="button" class="btn btn-outline btn-sm" id="mailBackBtn">&larr; Inbox</button>
-              <button type="button" class="btn btn-sm" id="mailJumpReply">Reply &darr;</button>
+              <button type="button" class="btn btn-outline btn-sm" id="mailBackBtn">&larr; Back</button>
             </div>
             <div id="mailboxReader" class="mail-reader">
-              <div class="empty-state">Select a message to read it.</div>
+              <div class="empty-state">Select a conversation to read it.</div>
             </div>
-            <form id="mailboxReplyForm" class="mail-reply" style="display:none;">
-              <input type="text" id="mailboxReplySubject" placeholder="Subject">
-              <textarea id="mailboxReplyBody" rows="6" placeholder="Write a reply&hellip;"></textarea>
-              <button type="submit" class="btn btn-sm" id="mailboxReplyBtn">Send Reply</button>
-              <div id="mailboxReplyStatus"></div>
-            </form>
           </div>
         </div>
       </section>
@@ -622,7 +663,7 @@
     window.scrollTo(0,0);
   });
   function updateBadges(){
-    var unread = mailboxCache.filter(function(m){ return !m.is_read; }).length;
+    var unread = mailboxCache.filter(function(m){ return !m.is_read && (m.folder || 'inbox') === 'inbox' && m.direction !== 'outbound'; }).length;
     var newOrders = ordersCache.filter(function(o){ return o.status === 'new'; }).length;
     [['badgeMail', unread], ['badgeOrders', newOrders]].forEach(function(b){
       var el = document.getElementById(b[0]); if(!el) return;
@@ -996,125 +1037,574 @@
   }
 
   // ============================================================
-  // MAILBOX
+  // MAILBOX: folders, conversations, compose, drafts
   // ============================================================
+  var INFO_ADDR = 'info@cloakedinnovations.co.ke';
+  var SUPPORT_ADDR = 'support@cloakedinnovations.co.ke';
+  var SCHEMA_HINT = 'Run supabase-mailbox.sql in the Supabase SQL editor first.';
+  var MAIL_FOLDERS = [['inbox','Inbox'],['starred','Starred'],['sent','Sent'],['drafts','Drafts'],['archive','Archive'],['spam','Spam'],['trash','Trash']];
   var mailboxCache = [];
-  var activeMailboxId = null;
+  var mailFolder = 'inbox';
+  var mailSearch = '';
+  var activeThreadKey = null;
+  var currentThreads = [];
+  var mailSelected = {};
+  var composeState = null;
+  var draftTimer = null;
+
+  function folderOf(m){ return m.folder || 'inbox'; }
+  function isOut(m){ return m.direction === 'outbound'; }
+  function mailText(m){ return m.body_text || htmlToText(m.body_html) || ''; }
+  function addrOf(s){ var m = /<([^>]+)>/.exec(s || ''); return (m ? m[1] : (s || '')).trim().toLowerCase(); }
+  function normSubject(s){ return String(s || '').toLowerCase().replace(/^(\s*(re|fwd?|fw)\s*:\s*)+/i, '').replace(/\s+/g, ' ').trim(); }
+  function mailboxOf(m){
+    var a = String(isOut(m) ? (m.from_address || '') : (m.to_address || '')).toLowerCase();
+    return a.indexOf('support@') > -1 ? 'support' : 'info';
+  }
+  function counterpart(m){ return isOut(m) ? addrOf(String(m.to_address || '').split(',')[0]) : addrOf(m.from_address); }
+  function threadKey(m){ return mailboxOf(m) + '|' + counterpart(m) + '|' + normSubject(m.subject); }
+  function byDateAsc(a, b){ return new Date(a.created_at) - new Date(b.created_at); }
+
+  function threadMessages(key, folder){
+    var allowed = (folder === 'spam' || folder === 'trash') ? [folder] : ['inbox', 'sent', 'archive'];
+    return mailboxCache.filter(function(m){ return allowed.indexOf(folderOf(m)) > -1 && threadKey(m) === key; }).sort(byDateAsc);
+  }
 
   function loadMailbox(){
-    supa.from('inbox_messages').select('*').order('created_at', {ascending:false}).then(function(res){
+    supa.from('inbox_messages').select('*').order('created_at', {ascending:false}).limit(1500).then(function(res){
       mailboxCache = res.data || [];
-      renderMailboxList();
+      renderMailbox();
       updateBadges();
     });
   }
 
-  function mailText(m){ return m.body_text || htmlToText(m.body_html) || ''; }
+  function folderMessages(folder){
+    return mailboxCache.filter(function(m){
+      var f = folderOf(m);
+      if(folder === 'starred') return m.is_starred && f !== 'trash' && f !== 'spam' && f !== 'drafts';
+      return f === folder;
+    });
+  }
 
-  function renderMailboxList(){
-    var wrap = document.getElementById('mailboxList');
-    if(mailboxCache.length === 0){ wrap.innerHTML = '<div class="empty-state">No messages yet.</div>'; return; }
-    wrap.innerHTML = mailboxCache.map(function(m){
-      var snippet = mailText(m).replace(/\s+/g,' ').trim().slice(0, 90);
-      return '<div class="conv-item mail-item' + (m.is_read ? '' : ' unread') + (String(m.id) === String(activeMailboxId) ? ' active' : '') + '" data-mail="' + m.id + '">' +
-        '<div class="mail-top"><span class="mail-from">' + esc(senderName(m.from_address)) + '</span><span class="mail-date">' + fmtShort(m.created_at) + '</span></div>' +
-        '<div class="mail-subject">' + esc(m.subject || '(no subject)') + '</div>' +
-        '<div class="mail-snippet">' + esc(snippet) + '</div>' +
-        '<div class="mail-inbox">to ' + esc(m.to_address) + '</div></div>';
+  function buildThreads(folder){
+    var msgs = folderMessages(folder);
+    if(mailSearch){
+      var q = mailSearch.toLowerCase();
+      msgs = msgs.filter(function(m){ return ((m.subject || '') + ' ' + (m.from_address || '') + ' ' + (m.to_address || '') + ' ' + mailText(m)).toLowerCase().indexOf(q) > -1; });
+    }
+    if(folder === 'drafts'){
+      return msgs.map(function(m){ return {key:'draft:' + m.id, draft:true, view:[m], latest:m}; });
+    }
+    var seen = {}, out = [];
+    msgs.forEach(function(m){
+      var k = threadKey(m);
+      if(seen[k]) return;
+      seen[k] = true;
+      var view = threadMessages(k, folder);
+      if(view.length === 0) return;
+      out.push({key:k, view:view, latest:view[view.length - 1]});
+    });
+    out.sort(function(a, b){ return new Date(b.latest.created_at) - new Date(a.latest.created_at); });
+    return out;
+  }
+
+  function folderCount(f){
+    if(f === 'inbox') return mailboxCache.filter(function(m){ return folderOf(m) === 'inbox' && !isOut(m) && !m.is_read; }).length;
+    if(f === 'drafts') return mailboxCache.filter(function(m){ return folderOf(m) === 'drafts'; }).length;
+    if(f === 'spam') return mailboxCache.filter(function(m){ return folderOf(m) === 'spam' && !m.is_read; }).length;
+    return 0;
+  }
+
+  function renderMailbox(){
+    renderMailFolders();
+    renderMailList();
+    renderMailBulk();
+    if(!composeState) renderReader();
+  }
+
+  function renderMailFolders(){
+    var wrap = document.getElementById('mailFolders');
+    wrap.innerHTML = MAIL_FOLDERS.map(function(f){
+      var c = folderCount(f[0]);
+      return '<button type="button" class="mail-folder' + (mailFolder === f[0] ? ' active' : '') + '" data-folder="' + f[0] + '">' + f[1] + (c ? '<b>' + c + '</b>' : '') + '</button>';
     }).join('');
-    wrap.querySelectorAll('.conv-item').forEach(function(item){
-      item.addEventListener('click', function(){
-        wrap.querySelectorAll('.conv-item').forEach(function(i){ i.classList.remove('active'); });
-        item.classList.add('active');
-        openMailboxMessage(item.getAttribute('data-mail'));
-        openDetail('mailTwoCol');
+    wrap.querySelectorAll('.mail-folder').forEach(function(b){
+      b.addEventListener('click', function(){
+        flushDraft();
+        mailFolder = b.getAttribute('data-folder');
+        mailSelected = {};
+        activeThreadKey = null;
+        composeState = null;
+        renderMailbox();
       });
     });
   }
 
-  function openMailboxMessage(id){
-    activeMailboxId = id;
-    var msg = mailboxCache.find(function(m){ return String(m.id) === String(id); });
-    if(!msg) return;
+  var EMPTY_TEXT = {inbox:'Your inbox is empty.', starred:'No starred conversations.', sent:'No sent emails yet.', drafts:'No drafts.', archive:'Nothing archived.', spam:'No spam.', trash:'Trash is empty.'};
 
-    var reader = document.getElementById('mailboxReader');
-    reader.innerHTML =
-      '<h3 class="mail-subject-h">' + esc(msg.subject || '(no subject)') + '</h3>' +
-      '<div class="mail-meta">' +
-        '<div><span>From</span>' + esc(msg.from_address) + '</div>' +
-        '<div><span>To</span>' + esc(msg.to_address) + '</div>' +
-        '<div><span>Date</span>' + fmtDate(msg.created_at) + '</div>' +
-      '</div>' +
-      '<div class="mail-actions">' +
-        '<button type="button" class="btn btn-outline btn-sm" data-mail-act="forward">Forward</button>' +
-        '<button type="button" class="btn btn-outline btn-sm" data-mail-act="unread">Mark unread</button>' +
-        '<button type="button" class="btn btn-outline btn-sm" data-mail-act="customer">Add as customer</button>' +
-        '<button type="button" class="btn btn-sm btn-danger" data-mail-act="delete">Delete</button>' +
-      '</div>' +
-      '<div class="mail-body">' + esc(mailText(msg) || '(no text content)') + '</div>';
-    bindMailActions(msg);
-
-    var replyForm = document.getElementById('mailboxReplyForm');
-    replyForm.style.display = 'flex';
-    document.getElementById('mailboxReplySubject').value = /^re:/i.test(msg.subject || '') ? msg.subject : 'Re: ' + (msg.subject || '');
-    document.getElementById('mailboxReplyBody').value = '';
-    document.getElementById('mailboxReplyStatus').textContent = '';
-
-    if(!msg.is_read){
-      supa.from('inbox_messages').update({is_read: true}).eq('id', id).then(function(){
-        msg.is_read = true;
-        renderMailboxList();
-        updateBadges();
+  function renderMailList(){
+    var wrap = document.getElementById('mailboxList');
+    currentThreads = buildThreads(mailFolder);
+    if(currentThreads.length === 0){
+      wrap.innerHTML = '<div class="empty-state">' + (mailSearch ? 'No matching conversations.' : EMPTY_TEXT[mailFolder]) + '</div>';
+      return;
+    }
+    wrap.innerHTML = currentThreads.map(function(t, i){
+      var l = t.latest;
+      var unread = !t.draft && t.view.some(function(m){ return !m.is_read; });
+      var starred = t.view.some(function(m){ return m.is_starred; });
+      var who;
+      if(t.draft){ who = '<span class="draft-tag">Draft</span> ' + esc(senderName(l.to_address) || '(no recipient)'); }
+      else if(mailFolder === 'sent'){ who = 'To: ' + esc(senderName(l.to_address)); }
+      else {
+        var names = [];
+        t.view.forEach(function(m){ var n = isOut(m) ? 'me' : senderName(m.from_address); if(names.indexOf(n) === -1) names.push(n); });
+        who = esc(names.join(', ')) + (t.view.length > 1 ? ' (' + t.view.length + ')' : '');
+      }
+      var snippet = esc(mailText(l).replace(/\s+/g, ' ').trim().slice(0, 90));
+      return '<div class="conv-item mail-item' + (unread ? ' unread' : '') + (t.key === activeThreadKey ? ' active' : '') + '" data-i="' + i + '">' +
+        '<div class="mail-row1">' +
+          '<input type="checkbox" class="mail-check" data-i="' + i + '"' + (mailSelected[t.key] ? ' checked' : '') + '>' +
+          '<button type="button" class="mail-star' + (starred ? ' on' : '') + '" data-i="' + i + '" title="Star">' + (starred ? '&#9733;' : '&#9734;') + '</button>' +
+          '<span class="mail-from">' + who + '</span><span class="mail-date">' + fmtShort(l.created_at) + '</span></div>' +
+        '<div class="mail-subject">' + esc(l.subject || '(no subject)') + '</div>' +
+        '<div class="mail-snippet">' + snippet + '</div>' +
+        '<div class="mail-inbox"><span class="mail-chip">' + (mailboxOf(l) === 'support' ? 'support@' : 'info@') + '</span></div></div>';
+    }).join('');
+    wrap.querySelectorAll('.conv-item').forEach(function(item){
+      item.addEventListener('click', function(e){
+        if(e.target.classList.contains('mail-check') || e.target.classList.contains('mail-star')) return;
+        openThread(parseInt(item.getAttribute('data-i'), 10));
       });
+    });
+    wrap.querySelectorAll('.mail-check').forEach(function(cb){
+      cb.addEventListener('change', function(){
+        var t = currentThreads[parseInt(cb.getAttribute('data-i'), 10)];
+        if(cb.checked) mailSelected[t.key] = true; else delete mailSelected[t.key];
+        renderMailBulk();
+      });
+    });
+    wrap.querySelectorAll('.mail-star').forEach(function(b){
+      b.addEventListener('click', function(){ toggleStar(currentThreads[parseInt(b.getAttribute('data-i'), 10)]); });
+    });
+  }
+
+  // Which actions apply in each folder: [action, label, danger?]
+  function actionsFor(folder){
+    if(folder === 'inbox' || folder === 'starred') return [['archive','Archive'],['spam','Report spam'],['trash','Delete'],['unread','Mark unread']];
+    if(folder === 'sent') return [['trash','Delete']];
+    if(folder === 'archive') return [['inbox','Move to inbox'],['spam','Report spam'],['trash','Delete']];
+    if(folder === 'spam') return [['inbox','Not spam'],['delete','Delete forever',1]];
+    if(folder === 'trash') return [['inbox','Restore'],['delete','Delete forever',1]];
+    return [];
+  }
+
+  function renderMailBulk(){
+    var wrap = document.getElementById('mailBulk');
+    var keys = Object.keys(mailSelected);
+    var html = '<label><input type="checkbox" id="mailSelAll"' + (keys.length && keys.length === currentThreads.length ? ' checked' : '') + '> All</label>';
+    if(keys.length){
+      html += '<span>' + keys.length + ' selected</span>';
+      if(mailFolder === 'drafts'){
+        html += '<button type="button" class="btn btn-sm btn-danger" data-bulk="discard">Discard</button>';
+      } else {
+        actionsFor(mailFolder).forEach(function(a){ html += '<button type="button" class="btn btn-outline btn-sm' + (a[2] ? ' btn-danger' : '') + '" data-bulk="' + a[0] + '">' + a[1] + '</button>'; });
+      }
+    } else if(mailFolder === 'trash' || mailFolder === 'spam'){
+      html += '<button type="button" class="btn btn-outline btn-sm btn-danger" data-bulk="empty">Empty ' + mailFolder + '</button>';
+    }
+    wrap.innerHTML = html;
+    document.getElementById('mailSelAll').addEventListener('change', function(){
+      mailSelected = {};
+      if(this.checked) currentThreads.forEach(function(t){ mailSelected[t.key] = true; });
+      renderMailList(); renderMailBulk();
+    });
+    wrap.querySelectorAll('[data-bulk]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var act = b.getAttribute('data-bulk');
+        if(act === 'empty'){
+          if(!confirm('Permanently delete everything in ' + mailFolder + '?')) return;
+          currentThreads.forEach(function(t){ mailSelected[t.key] = true; });
+          act = 'delete';
+        } else if(act === 'delete' && !confirm('Delete forever? This cannot be undone.')) return;
+        if(act === 'discard'){
+          if(!confirm('Discard the selected drafts?')) return;
+          act = 'delete';
+        }
+        doMailAction(act, Object.keys(mailSelected));
+      });
+    });
+  }
+
+  // ---------- updates and deletes ----------
+  function mailUpdate(ids, patch){
+    if(!ids.length) return Promise.resolve({ok:true});
+    return supa.from('inbox_messages').update(patch).in('id', ids).select().then(function(res){
+      if(res.error){ return {ok:false, error: /column|folder|direction|is_starred/i.test(res.error.message) ? SCHEMA_HINT : res.error.message}; }
+      if(!res.data || !res.data.length) return {ok:false, error: PERMISSION_HINT};
+      res.data.forEach(function(r){
+        var m = mailboxCache.find(function(x){ return String(x.id) === String(r.id); });
+        if(m) Object.keys(r).forEach(function(k){ m[k] = r[k]; });
+      });
+      return {ok:true};
+    });
+  }
+  function mailDelete(ids){
+    if(!ids.length) return Promise.resolve({ok:true});
+    return supa.from('inbox_messages').delete().in('id', ids).select().then(function(res){
+      if(res.error) return {ok:false, error:res.error.message};
+      if(!res.data || !res.data.length) return {ok:false, error: PERMISSION_HINT};
+      mailboxCache = mailboxCache.filter(function(m){ return ids.map(String).indexOf(String(m.id)) === -1; });
+      return {ok:true};
+    });
+  }
+
+  var DONE_TEXT = {archive:'Archived.', spam:'Reported as spam.', trash:'Moved to Trash.', inbox:'Moved to Inbox.', delete:'Deleted.', unread:'Marked as unread.', read:'Marked as read.'};
+
+  function doMailAction(act, keys){
+    var moves = {}, delIds = [], readIds = [], unreadIds = [];
+    function add(target, id){ (moves[target] = moves[target] || []).push(id); }
+    keys.forEach(function(k){
+      var draftThread = k.indexOf('draft:') === 0;
+      var view = draftThread ? mailboxCache.filter(function(m){ return 'draft:' + m.id === k; }) : threadMessages(k, mailFolder);
+      view.forEach(function(m){
+        var f = folderOf(m);
+        if(act === 'archive'){ if(f === 'inbox') add('archive', m.id); }
+        else if(act === 'inbox'){ add(isOut(m) ? 'sent' : 'inbox', m.id); }
+        else if(act === 'spam'){ if(!isOut(m)) add('spam', m.id); }
+        else if(act === 'trash'){ add('trash', m.id); }
+        else if(act === 'delete'){ delIds.push(m.id); }
+        else if(act === 'read'){ if(!m.is_read) readIds.push(m.id); }
+      });
+      if(act === 'unread'){
+        var inbound = view.filter(function(m){ return !isOut(m); });
+        if(inbound.length) unreadIds.push(inbound[inbound.length - 1].id);
+      }
+    });
+    var jobs = Object.keys(moves).map(function(t){ return mailUpdate(moves[t], {folder:t}); });
+    jobs.push(mailUpdate(readIds, {is_read:true}));
+    jobs.push(mailUpdate(unreadIds, {is_read:false}));
+    jobs.push(mailDelete(delIds));
+    Promise.all(jobs).then(function(results){
+      var bad = results.find(function(r){ return !r.ok; });
+      if(bad){ toast(bad.error); return; }
+      toast(DONE_TEXT[act] || 'Done.');
+      mailSelected = {};
+      if(keys.indexOf(activeThreadKey) > -1 && act !== 'unread' && act !== 'read'){
+        activeThreadKey = null;
+        if(isMobile()) closeDetail('mailTwoCol');
+      }
+      renderMailbox();
+      updateBadges();
+    });
+  }
+
+  function toggleStar(t){
+    var starred = t.view.filter(function(m){ return m.is_starred; });
+    var p = starred.length
+      ? mailUpdate(starred.map(function(m){ return m.id; }), {is_starred:false})
+      : mailUpdate([t.latest.id], {is_starred:true});
+    p.then(function(r){ if(!r.ok){ toast(r.error); return; } renderMailbox(); });
+  }
+
+  // ---------- reading a conversation ----------
+  function getThread(key){ return currentThreads.find(function(t){ return t.key === key; }); }
+
+  function openThread(i){
+    var t = currentThreads[i];
+    if(!t) return;
+    flushDraft();
+    if(t.draft){
+      activeThreadKey = t.key;
+      openDraft(t.latest);
+      openDetail('mailTwoCol');
+      renderMailList();
+      return;
+    }
+    composeState = null;
+    activeThreadKey = t.key;
+    renderReader();
+    renderMailList();
+    openDetail('mailTwoCol');
+    var unread = t.view.filter(function(m){ return !m.is_read && !isOut(m); }).map(function(m){ return m.id; });
+    if(unread.length){
+      mailUpdate(unread, {is_read:true}).then(function(r){ if(r.ok){ renderMailList(); renderMailFolders(); updateBadges(); } });
     }
   }
 
-  document.getElementById('mailBackBtn').addEventListener('click', function(){ closeDetail('mailTwoCol'); });
-  document.getElementById('chatBackBtn').addEventListener('click', function(){ closeDetail('chatTwoCol'); });
-  document.getElementById('mailJumpReply').addEventListener('click', function(){
-    var f = document.getElementById('mailboxReplyForm');
-    f.scrollIntoView({behavior:'smooth', block:'start'});
-    setTimeout(function(){ document.getElementById('mailboxReplyBody').focus({preventScroll:true}); }, 350);
+  // Split a message into the new text and the quoted history ("On ... wrote:")
+  function splitQuoted(text){
+    var lines = String(text || '').replace(/\r/g, '').split('\n');
+    var idx = -1;
+    for(var i = 0; i < lines.length; i++){
+      var ln = lines[i];
+      if(/^On .{5,250}wrote:\s*$/i.test(ln) || /^-{2,}\s*Original Message\s*-{2,}/i.test(ln)){ idx = i; break; }
+      if(/^On /.test(ln) && i + 1 < lines.length && /wrote:\s*$/i.test(lines[i + 1])){ idx = i; break; }
+      if(/^>/.test(ln)){ idx = i; break; }
+    }
+    if(idx <= 0) return {main: String(text || ''), quoted: ''};
+    return {main: lines.slice(0, idx).join('\n').replace(/\s+$/, ''), quoted: lines.slice(idx).join('\n')};
+  }
+
+  function renderReader(){
+    var reader = document.getElementById('mailboxReader');
+    var t = activeThreadKey ? getThread(activeThreadKey) : null;
+    if(!t || t.draft){
+      if(!t){ reader.innerHTML = '<div class="empty-state">Select a conversation to read it.</div>'; }
+      return;
+    }
+    var subject = t.latest.subject || '(no subject)';
+    var acts = actionsFor(mailFolder).map(function(a){
+      return '<button type="button" class="btn btn-outline btn-sm' + (a[2] ? ' btn-danger' : '') + '" data-tact="' + a[0] + '">' + a[1] + '</button>';
+    }).join('');
+    var inboundMsgs = t.view.filter(function(m){ return !isOut(m); });
+    if(inboundMsgs.length) acts += '<button type="button" class="btn btn-outline btn-sm" data-tact="customer">Add as customer</button>';
+
+    var msgsHtml = t.view.map(function(m, idx){
+      var last = idx === t.view.length - 1;
+      var collapsed = !last && m.is_read !== false;
+      var name = senderName(m.from_address);
+      var addr = addrOf(m.from_address);
+      var parts = splitQuoted(mailText(m));
+      var to = isOut(m) ? 'to ' + esc(String(m.to_address || '')) : 'to ' + (mailboxOf(m) === 'support' ? SUPPORT_ADDR : INFO_ADDR);
+      return '<div class="tmsg' + (isOut(m) ? ' out' : '') + (collapsed ? ' collapsed' : '') + '" data-mid="' + m.id + '">' +
+        '<div class="tmsg-head"><div class="tmsg-avatar">' + esc((name || '?').charAt(0).toUpperCase()) + '</div>' +
+          '<div class="tmsg-who"><strong>' + esc(name) + '</strong> <span class="tmsg-addr">&lt;' + esc(addr) + '&gt;</span><div class="tmsg-to">' + to + '</div></div>' +
+          '<div class="tmsg-date">' + fmtDate(m.created_at) + '</div></div>' +
+        '<div class="tmsg-snippet">' + esc(parts.main.replace(/\s+/g, ' ').slice(0, 140)) + '</div>' +
+        '<div class="tmsg-body">' + esc(parts.main || '(no text content)') +
+          (parts.quoted ? '<div><button type="button" class="tmsg-trim" data-trim="1">&middot;&middot;&middot;</button></div><div class="tmsg-quoted">' + esc(parts.quoted) + '</div>' : '') + '</div>' +
+        ((mailFolder === 'spam' || mailFolder === 'trash') ? '' :
+          '<div class="tmsg-actions"><button type="button" class="btn btn-outline btn-sm" data-reply="' + m.id + '">Reply</button><button type="button" class="btn btn-outline btn-sm" data-forward="' + m.id + '">Forward</button></div>') +
+      '</div>';
+    }).join('');
+
+    reader.innerHTML =
+      '<div class="thread-head"><h3 class="mail-subject-h">' + esc(subject) + '</h3></div>' +
+      '<div class="mail-actions">' + acts + '</div>' +
+      '<div class="thread-msgs">' + msgsHtml + '</div>' +
+      ((mailFolder === 'spam' || mailFolder === 'trash') ? '' :
+        '<div class="thread-reply-bar"><button type="button" class="btn btn-sm" id="threadReplyBtn">Reply</button><button type="button" class="btn btn-outline btn-sm" id="threadForwardBtn">Forward</button></div>') +
+      '<div id="threadComposer"></div>';
+
+    reader.querySelectorAll('.tmsg-head').forEach(function(hd){
+      hd.addEventListener('click', function(){ hd.parentNode.classList.toggle('collapsed'); });
+    });
+    reader.querySelectorAll('[data-trim]').forEach(function(b){
+      b.addEventListener('click', function(){ b.parentNode.nextElementSibling.classList.toggle('open'); });
+    });
+    reader.querySelectorAll('[data-tact]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var act = b.getAttribute('data-tact');
+        if(act === 'customer'){ addSenderAsCustomer(inboundMsgs[inboundMsgs.length - 1]); return; }
+        if(act === 'delete' && !confirm('Delete this conversation forever? This cannot be undone.')) return;
+        doMailAction(act, [t.key]);
+      });
+    });
+    function msgById(id){ return t.view.find(function(m){ return String(m.id) === String(id); }); }
+    reader.querySelectorAll('[data-reply]').forEach(function(b){ b.addEventListener('click', function(){ startReply(t, msgById(b.getAttribute('data-reply')), 'reply'); }); });
+    reader.querySelectorAll('[data-forward]').forEach(function(b){ b.addEventListener('click', function(){ startReply(t, msgById(b.getAttribute('data-forward')), 'forward'); }); });
+    var rb = document.getElementById('threadReplyBtn'); if(rb) rb.addEventListener('click', function(){ startReply(t, t.view[t.view.length - 1], 'reply'); });
+    var fb = document.getElementById('threadForwardBtn'); if(fb) fb.addEventListener('click', function(){ startReply(t, t.view[t.view.length - 1], 'forward'); });
+  }
+
+  function addSenderAsCustomer(msg){
+    if(!msg) return;
+    var email = addrOf(msg.from_address);
+    var exists = customersCache.some(function(c){ return (c.email || '').toLowerCase() === email; });
+    if(exists){ toast('This sender is already a customer.'); return; }
+    supa.from('customers').insert({full_name: senderName(msg.from_address) || email, organisation:'', email:email, phone:''}).then(function(res){
+      if(res.error){ toast('Could not add customer.'); return; }
+      toast('Added to customers.'); loadCustomers();
+    });
+  }
+
+  // ---------- composing: reply, forward, new message ----------
+  function buildQuote(msg){
+    var who = senderName(msg.from_address), addr = addrOf(msg.from_address);
+    var main = splitQuoted(mailText(msg)).main;
+    return 'On ' + fmtDate(msg.created_at) + ', ' + who + (who !== addr ? ' <' + addr + '>' : '') + ' wrote:\n' +
+      main.split('\n').map(function(l){ return '> ' + l; }).join('\n');
+  }
+  function lastInboundId(t){
+    var inbound = t.view.filter(function(m){ return !isOut(m) && m.message_id; });
+    return inbound.length ? inbound[inbound.length - 1].message_id : null;
+  }
+
+  function startReply(t, msg, mode){
+    flushDraft();
+    var purpose = mailboxOf(msg) === 'support' ? 'support' : 'general';
+    var subj = msg.subject || '';
+    if(mode === 'reply'){
+      composeState = {mode:'reply', purpose:purpose, to: isOut(msg) ? String(msg.to_address || '').split(',')[0].trim() : addrOf(msg.from_address),
+        subject: /^re:/i.test(subj) ? subj : 'Re: ' + subj, body:'', quote: buildQuote(msg), inReplyTo: lastInboundId(t), draftId:null};
+    } else {
+      var fwd = '\n\n---------- Forwarded message ----------\nFrom: ' + msg.from_address + '\nDate: ' + fmtDate(msg.created_at) +
+        '\nSubject: ' + subj + '\nTo: ' + msg.to_address + '\n\n' + mailText(msg);
+      composeState = {mode:'forward', purpose:purpose, to:'', subject: /^fwd?:/i.test(subj) ? subj : 'Fwd: ' + subj, body:fwd, quote:'', inReplyTo:null, draftId:null};
+    }
+    showComposer(document.getElementById('threadComposer'));
+  }
+
+  function newMessage(){
+    flushDraft();
+    activeThreadKey = null;
+    composeState = {mode:'new', purpose:'general', to:'', subject:'', body:'', quote:'', inReplyTo:null, draftId:null};
+    document.getElementById('mailboxReader').innerHTML = '<div id="threadComposer"></div>';
+    showComposer(document.getElementById('threadComposer'));
+    openDetail('mailTwoCol');
+    renderMailList();
+  }
+
+  function openDraft(d){
+    var quote = '';
+    if(d.in_reply_to){
+      var orig = mailboxCache.find(function(m){ return m.message_id && m.message_id === d.in_reply_to; });
+      if(orig) quote = buildQuote(orig);
+    }
+    composeState = {mode: d.in_reply_to ? 'reply' : 'new', purpose: String(d.from_address || '').toLowerCase().indexOf('support@') > -1 ? 'support' : 'general',
+      to: d.to_address || '', subject: d.subject || '', body: d.body_text || '', quote: quote, inReplyTo: d.in_reply_to || null, draftId: d.id};
+    document.getElementById('mailboxReader').innerHTML = '<div id="threadComposer"></div>';
+    showComposer(document.getElementById('threadComposer'));
+  }
+
+  function showComposer(box){
+    var s = composeState;
+    var title = s.mode === 'reply' ? 'Reply' : (s.mode === 'forward' ? 'Forward' : 'New message');
+    box.innerHTML =
+      '<div class="composer">' +
+        '<h4>' + title + '</h4>' +
+        '<div><label>From</label><select id="cmpFrom"><option value="general">Cloaked Innovations (' + INFO_ADDR + ')</option><option value="support">Cloaked Innovations Support (' + SUPPORT_ADDR + ')</option></select></div>' +
+        '<div><label>To</label><input type="email" id="cmpTo" placeholder="name@example.com"></div>' +
+        '<div><label>Subject</label><input type="text" id="cmpSubject"></div>' +
+        '<div><textarea id="cmpBody" rows="' + (s.mode === 'forward' ? 12 : 8) + '" placeholder="Write your message"></textarea></div>' +
+        (s.quote ? '<div class="composer-note">The original message is included below your reply when you send.</div>' : '') +
+        '<div class="composer-actions"><button type="button" class="btn btn-sm" id="cmpSend">Send</button>' +
+        '<button type="button" class="btn btn-outline btn-sm" id="cmpSave">Save draft</button>' +
+        '<button type="button" class="btn btn-outline btn-sm btn-danger" id="cmpDiscard">Discard</button>' +
+        '<span id="cmpStatus" class="composer-note"></span></div>' +
+      '</div>';
+    document.getElementById('cmpFrom').value = s.purpose;
+    document.getElementById('cmpTo').value = s.to;
+    document.getElementById('cmpSubject').value = s.subject;
+    document.getElementById('cmpBody').value = s.body;
+    function sync(){
+      s.purpose = document.getElementById('cmpFrom').value;
+      s.to = document.getElementById('cmpTo').value.trim();
+      s.subject = document.getElementById('cmpSubject').value.trim();
+      s.body = document.getElementById('cmpBody').value;
+      s.dirty = true;
+      clearTimeout(draftTimer);
+      draftTimer = setTimeout(function(){ saveDraft(true); }, 2500);
+    }
+    ['cmpFrom', 'cmpTo', 'cmpSubject', 'cmpBody'].forEach(function(id){ document.getElementById(id).addEventListener('input', sync); });
+    document.getElementById('cmpFrom').addEventListener('change', sync);
+    document.getElementById('cmpSend').addEventListener('click', sendComposer);
+    document.getElementById('cmpSave').addEventListener('click', function(){ saveDraft(false); });
+    document.getElementById('cmpDiscard').addEventListener('click', discardComposer);
+    box.scrollIntoView({behavior:'smooth', block:'nearest'});
+    var f = document.getElementById(s.mode === 'new' || s.mode === 'forward' ? 'cmpTo' : 'cmpBody');
+    if(f) f.focus({preventScroll:true});
+  }
+
+  function setCmpStatus(msg, color){
+    var el = document.getElementById('cmpStatus');
+    if(el){ el.textContent = msg; el.style.color = color || 'var(--muted)'; }
+  }
+
+  function saveDraft(silent){
+    var s = composeState;
+    if(!s || (!s.to && !s.subject && !s.body.trim())) return Promise.resolve();
+    clearTimeout(draftTimer);
+    var row = {direction:'outbound', folder:'drafts', from_address: s.purpose === 'support' ? SUPPORT_ADDR : INFO_ADDR,
+      to_address: s.to, subject: s.subject, body_text: s.body, in_reply_to: s.inReplyTo || null, is_read: true};
+    var p;
+    if(s.draftId){
+      p = supa.from('inbox_messages').update(row).eq('id', s.draftId).select();
+    } else {
+      p = supa.from('inbox_messages').insert(row).select();
+    }
+    return p.then(function(res){
+      if(res.error){ setCmpStatus(/column|folder|direction/i.test(res.error.message) ? SCHEMA_HINT : res.error.message, 'var(--danger)'); return; }
+      var saved = res.data && res.data[0];
+      if(saved){
+        s.draftId = saved.id; s.dirty = false;
+        var i = mailboxCache.findIndex(function(m){ return String(m.id) === String(saved.id); });
+        if(i > -1) mailboxCache[i] = saved; else mailboxCache.unshift(saved);
+        renderMailFolders();
+        if(mailFolder === 'drafts') renderMailList();
+      }
+      setCmpStatus(silent ? 'Draft saved.' : 'Draft saved to Drafts.', 'var(--success)');
+    });
+  }
+
+  // Save any unsaved draft when the person moves elsewhere
+  function flushDraft(){
+    if(composeState && composeState.dirty) saveDraft(true);
+  }
+
+  function discardComposer(){
+    var s = composeState;
+    if(!s) return;
+    if((s.body.trim() || s.to || s.subject) && !confirm('Discard this message?')) return;
+    clearTimeout(draftTimer);
+    var done = function(){ composeState = null; activeThreadKey = (mailFolder === 'drafts') ? null : activeThreadKey; renderMailbox(); };
+    if(s.draftId){ mailDelete([s.draftId]).then(done); } else { done(); }
+  }
+
+  function sendComposer(){
+    var s = composeState;
+    if(!s) return;
+    s.to = document.getElementById('cmpTo').value.trim();
+    s.subject = document.getElementById('cmpSubject').value.trim();
+    s.body = document.getElementById('cmpBody').value;
+    s.purpose = document.getElementById('cmpFrom').value;
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.to)){ setCmpStatus('Enter one valid email address in To.', 'var(--danger)'); return; }
+    if(!s.body.trim()){ setCmpStatus('Write a message first.', 'var(--danger)'); return; }
+    if(!s.subject && !confirm('Send without a subject?')) return;
+    clearTimeout(draftTimer);
+    var btn = document.getElementById('cmpSend');
+    btn.disabled = true; btn.textContent = 'Sending…';
+    setCmpStatus('Sending…');
+    var fullBody = s.body + (s.quote ? '\n\n' + s.quote : '');
+    sendEmailApi({to:s.to, subject: s.subject || '(no subject)', body:fullBody, purpose:s.purpose, inReplyTo:s.inReplyTo})
+      .then(function(r){ return r.json().then(function(data){ return {ok:r.ok, data:data}; }); })
+      .then(function(res){
+        if(!res.ok){
+          setCmpStatus('Failed: ' + ((res.data && res.data.error) || 'unknown error.'), 'var(--danger)');
+          btn.disabled = false; btn.textContent = 'Send';
+          return;
+        }
+        var draftId = s.draftId;
+        composeState = null;
+        var after = function(){
+          toast(res.data.saved === false ? 'Sent. It could not be saved to Sent: run supabase-mailbox.sql.' : 'Message sent.');
+          loadMailbox();
+        };
+        if(draftId){ mailDelete([draftId]).then(after); } else { after(); }
+      }, function(){
+        setCmpStatus('Could not reach the server.', 'var(--danger)');
+        btn.disabled = false; btn.textContent = 'Send';
+      });
+  }
+
+  // ---------- wiring ----------
+  document.getElementById('composeBtn').addEventListener('click', newMessage);
+  document.getElementById('mailSearch').addEventListener('input', function(){
+    mailSearch = this.value.trim();
+    mailSelected = {};
+    renderMailList(); renderMailBulk();
   });
+  document.getElementById('mailBackBtn').addEventListener('click', function(){ flushDraft(); closeDetail('mailTwoCol'); });
+  document.getElementById('chatBackBtn').addEventListener('click', function(){ closeDetail('chatTwoCol'); });
   document.getElementById('refreshMailboxBtn').addEventListener('click', function(){ loadMailbox(); toast('Refreshing…'); });
   document.getElementById('refreshOrdersBtn').addEventListener('click', function(){ loadOrders(); toast('Refreshing…'); });
   document.addEventListener('visibilitychange', function(){
     if(!document.hidden && dashboard.style.display === 'block'){ loadMailbox(); loadOrders(); }
   });
-
-  document.getElementById('mailboxReplyForm').addEventListener('submit', function(e){
-    e.preventDefault();
-    var msg = mailboxCache.find(function(m){ return m.id === activeMailboxId; });
-    if(!msg) return;
-    var subject = document.getElementById('mailboxReplySubject').value.trim();
-    var body = document.getElementById('mailboxReplyBody').value.trim();
-    var statusEl = document.getElementById('mailboxReplyStatus');
-    if(!body){ statusEl.textContent = 'Write a reply first.'; statusEl.style.color = 'var(--danger)'; return; }
-
-    var purpose = (msg.to_address || '').indexOf('support@') !== -1 ? 'support' : 'general';
-    var replyBtn = document.getElementById('mailboxReplyBtn');
-    replyBtn.disabled = true; replyBtn.textContent = 'Sending…';
-    statusEl.textContent = 'Sending…'; statusEl.style.color = 'var(--muted)';
-    sendEmailApi({
-        to: msg.from_address, subject: subject, body: body,
-        purpose: purpose, inReplyTo: msg.message_id
-      }).then(function(r){ return r.json().then(function(data){ return {ok: r.ok, data: data}; }); })
-      .then(function(res){
-        if(res.ok){
-          statusEl.textContent = 'Reply sent.'; statusEl.style.color = 'var(--success)';
-          document.getElementById('mailboxReplyBody').value = '';
-          toast('Reply sent.');
-        } else {
-          statusEl.textContent = 'Failed: ' + (res.data.error || 'unknown error.');
-          statusEl.style.color = 'var(--danger)';
-        }
-      }).catch(function(){
-        statusEl.textContent = 'Could not reach /api/send-email.';
-        statusEl.style.color = 'var(--danger)';
-      }).then(function(){
-        replyBtn.disabled = false; replyBtn.textContent = 'Send Reply';
-      });
-  });
+  setInterval(function(){
+    if(!document.hidden && dashboard.style.display === 'block' && !composeState){ loadMailbox(); }
+  }, 60000);
 
   // Sends an email through the server. The admin login token is attached so
   // the server can confirm the request comes from a logged in admin.
@@ -1375,60 +1865,6 @@
     document.getElementById('emailBody').focus();
   });
 
-  // ----- Mailbox: forward, mark unread, add as customer, delete
-  function bindMailActions(msg){
-    var reader = document.getElementById('mailboxReader');
-    var act = function(name){ return reader.querySelector('[data-mail-act="' + name + '"]'); };
-
-    act('forward').addEventListener('click', function(){
-      var body = '\n\n---------- Forwarded message ----------\nFrom: ' + msg.from_address + '\nDate: ' + fmtDate(msg.created_at) +
-        '\nSubject: ' + (msg.subject || '') + '\nTo: ' + msg.to_address + '\n\n' + mailText(msg);
-      var purpose = (msg.to_address || '').indexOf('support@') !== -1 ? 'support' : 'general';
-      openModal({title:'Forward email', saveLabel:'Send', busyLabel:'Sending…', fields:[
-        {id:'to', label:'To', type:'email', value:''},
-        {id:'subject', label:'Subject', value:/^fwd?:/i.test(msg.subject || '') ? msg.subject : 'Fwd: ' + (msg.subject || '')},
-        {id:'body', label:'Message (write your note above the forwarded text)', type:'textarea', rows:12, value:body}
-      ], onSave:function(v){
-        if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.to)) return {error:'Enter a valid email address in To.'};
-        return sendEmailApi({to:v.to, subject:v.subject, body:v.body, purpose:purpose})
-          .then(function(r){ return r.json().then(function(data){ return {ok:r.ok, data:data}; }); })
-          .then(function(res){
-            if(res.ok){ toast('Email forwarded.'); return {}; }
-            return {error:(res.data && res.data.error) || 'Could not send the email.'};
-          }, function(){ return {error:'Could not reach the server.'}; });
-      }});
-    });
-
-    act('unread').addEventListener('click', function(){
-      dbUpdate('inbox_messages', msg.id, {is_read:false}).then(function(r){
-        if(!r.ok){ toast(r.error); return; }
-        msg.is_read = false; renderMailboxList(); updateBadges(); toast('Marked as unread.');
-      });
-    });
-
-    act('customer').addEventListener('click', function(){
-      var email = addrOnly(msg.from_address);
-      var exists = customersCache.some(function(c){ return (c.email || '').toLowerCase() === email.toLowerCase(); });
-      if(exists){ toast('This sender is already a customer.'); return; }
-      supa.from('customers').insert({full_name: senderName(msg.from_address) || email, organisation:'', email:email, phone:''}).then(function(res){
-        if(res.error){ toast('Could not add customer.'); return; }
-        toast('Added to customers.'); loadCustomers();
-      });
-    });
-
-    act('delete').addEventListener('click', function(){
-      if(!confirm('Delete this email? This cannot be undone.')) return;
-      dbDelete('inbox_messages', msg.id).then(function(d){
-        if(!d.ok){ toast(d.error); return; }
-        mailboxCache = mailboxCache.filter(function(m){ return String(m.id) !== String(msg.id); });
-        activeMailboxId = null;
-        document.getElementById('mailboxReader').innerHTML = '<div class="empty-state">Select a message to read it.</div>';
-        document.getElementById('mailboxReplyForm').style.display = 'none';
-        renderMailboxList(); updateBadges(); closeDetail('mailTwoCol');
-        toast('Email deleted.');
-      });
-    });
-  }
 
   // ============================================================
   // TEAM: add and remove admins, change password
