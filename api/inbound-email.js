@@ -115,6 +115,25 @@ export default async function handler(req, res) {
     is_read: false
   };
 
+  // Senders that were already reported as spam go straight to the Spam folder.
+  // If the folder column does not exist yet this check simply fails and is skipped.
+  try {
+    const m = /<([^>]+)>/.exec(row.from_address || '');
+    const addr = (m ? m[1] : (row.from_address || '')).trim().toLowerCase();
+    if (addr) {
+      const q = await fetch(
+        `${supabaseUrl}/rest/v1/inbox_messages?select=id&folder=eq.spam&from_address=ilike.*${encodeURIComponent(addr)}*&limit=1`,
+        { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } }
+      );
+      if (q.ok) {
+        const found = await q.json();
+        if (Array.isArray(found) && found.length > 0) row.folder = 'spam';
+      }
+    }
+  } catch (e) {
+    // ignore: the message is stored in the inbox
+  }
+
   try {
     const insertRes = await fetch(`${supabaseUrl}/rest/v1/inbox_messages`, {
       method: 'POST',
