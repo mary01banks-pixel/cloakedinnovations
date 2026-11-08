@@ -537,3 +537,7 @@
   .callout p{margin:0;}
   .sources ol{font-size:0.95rem;}
   .related-posts{margin-top:40px;}
+
+/* Homepage product category photography */
+.home-product-photo{height:230px;object-fit:cover;}
+@media(max-width:640px){.home-product-photo{height:190px;}}
